@@ -1,0 +1,194 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "DocEditorService/1.0.0": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3",
+          "Swashbuckle.AspNetCore": "10.1.7",
+          "Syncfusion.DocIO.Net.Core": "33.1.49",
+          "Syncfusion.EJ2.WordEditor.AspNet.Core": "33.1.49"
+        },
+        "runtime": {
+          "DocEditorService.dll": {}
+        }
+      },
+      "Microsoft.NETCore.Platforms/2.0.0": {},
+      "NETStandard.Library/2.0.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0"
+        }
+      },
+      "Newtonsoft.Json/13.0.3": {
+        "runtime": {
+          "lib/net6.0/Newtonsoft.Json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.3.27908"
+          }
+        }
+      },
+      "Swashbuckle.AspNetCore/10.1.7": {},
+      "Syncfusion.Compression.Net.Core/33.1.49": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.Compression.Portable.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "Syncfusion.DocIO.Net.Core/33.1.49": {
+        "dependencies": {
+          "Syncfusion.Compression.Net.Core": "33.1.49",
+          "Syncfusion.Licensing": "33.1.49",
+          "Syncfusion.Markdown": "33.1.49",
+          "Syncfusion.OfficeChart.Net.Core": "33.1.49",
+          "System.Text.Encoding.CodePages": "4.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.DocIO.Portable.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "Syncfusion.EJ2.WordEditor.AspNet.Core/33.1.49": {
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3",
+          "Syncfusion.Compression.Net.Core": "33.1.49",
+          "Syncfusion.DocIO.Net.Core": "33.1.49",
+          "Syncfusion.OfficeChart.Net.Core": "33.1.49"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.EJ2.DocumentEditor.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "Syncfusion.Licensing/33.1.49": {
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.Licensing.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "Syncfusion.Markdown/33.1.49": {
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.Markdown.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "Syncfusion.OfficeChart.Net.Core/33.1.49": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.0",
+          "Syncfusion.Compression.Net.Core": "33.1.49"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Syncfusion.OfficeChart.Portable.dll": {
+            "assemblyVersion": "33.1.49.0",
+            "fileVersion": "33.1.49.0"
+          }
+        }
+      },
+      "System.Text.Encoding.CodePages/4.4.0": {
+        "dependencies": {
+          "Microsoft.NETCore.Platforms": "2.0.0"
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DocEditorService/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.NETCore.Platforms/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VdLJOCXhZaEMY7Hm2GKiULmn7IEPFE4XC5LPSfBVCUIA8YLZVh846gtfBJalsPQF2PlzdD7ecX7DZEulJ402ZQ==",
+      "path": "microsoft.netcore.platforms/2.0.0",
+      "hashPath": "microsoft.netcore.platforms.2.0.0.nupkg.sha512"
+    },
+    "NETStandard.Library/2.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7jnbRU+L08FXKMxqUflxEXtVymWvNOrS8yHgu9s6EM8Anr6T/wIX4nZ08j/u3Asz+tCufp3YVwFSEvFTPYmBPA==",
+      "path": "netstandard.library/2.0.0",
+      "hashPath": "netstandard.library.2.0.0.nupkg.sha512"
+    },
+    "Newtonsoft.Json/13.0.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ==",
+      "path": "newtonsoft.json/13.0.3",
+      "hashPath": "newtonsoft.json.13.0.3.nupkg.sha512"
+    },
+    "Swashbuckle.AspNetCore/10.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-vgef8DPT411JU5JjHiDbr0WOxsIVuAvegPGtqmm4Na4JRl/264dfBJcGkiPHsAr5P+Vda+qN1rZKRtBl1rF9aA==",
+      "path": "swashbuckle.aspnetcore/10.1.7",
+      "hashPath": "swashbuckle.aspnetcore.10.1.7.nupkg.sha512"
+    },
+    "Syncfusion.Compression.Net.Core/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-fT5MH1Ne02jG9x7PIXZhoQ960Hv7vyepXYM3jEcAAF3BdCkuURtUjxUcwpgmYVAWTu6m6haoIE5kX+IWwYVJAg==",
+      "path": "syncfusion.compression.net.core/33.1.49",
+      "hashPath": "syncfusion.compression.net.core.33.1.49.nupkg.sha512"
+    },
+    "Syncfusion.DocIO.Net.Core/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-o3/D0c2+8WzlQ9uevs1zxSGaKrV39iPqmp274geWdfG9MvRnDTkiBu5HmfO1hix99q5hOYw/+L251LMN/gsijw==",
+      "path": "syncfusion.docio.net.core/33.1.49",
+      "hashPath": "syncfusion.docio.net.core.33.1.49.nupkg.sha512"
+    },
+    "Syncfusion.EJ2.WordEditor.AspNet.Core/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HrPMoyKkA3QudF4UNtwEiDr/qm29JqD9AQbYBa4oYnszdQ9D4S4a/qiozJiU9jh0cDtID0kaRciPY7BmPiB5ag==",
+      "path": "syncfusion.ej2.wordeditor.aspnet.core/33.1.49",
+      "hashPath": "syncfusion.ej2.wordeditor.aspnet.core.33.1.49.nupkg.sha512"
+    },
+    "Syncfusion.Licensing/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-FTivq30PpZnRBrx4+8F43afSxHPINLtZrVZsCMci5COdXOf1kX4VzTDKHd0lCyFSqCdT6qODPm7NWCe2/PvCGg==",
+      "path": "syncfusion.licensing/33.1.49",
+      "hashPath": "syncfusion.licensing.33.1.49.nupkg.sha512"
+    },
+    "Syncfusion.Markdown/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ZajPHx+gjPKWDEDRvFwX5otWBmCIcjQsE7HvLkUO0hDd8FU1EWgFPkHADSRmU+wibAcoPXwz1qIRhRrqeuHsxA==",
+      "path": "syncfusion.markdown/33.1.49",
+      "hashPath": "syncfusion.markdown.33.1.49.nupkg.sha512"
+    },
+    "Syncfusion.OfficeChart.Net.Core/33.1.49": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HQ2uXxfLCo/w9FxJXqoS0yRw1+TWPam+vxV8RpwqD5usmficFz+YKCPE88sFKuW3Fmj+L/0IikDjcFxtuOCAhg==",
+      "path": "syncfusion.officechart.net.core/33.1.49",
+      "hashPath": "syncfusion.officechart.net.core.33.1.49.nupkg.sha512"
+    },
+    "System.Text.Encoding.CodePages/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-6JX7ZdaceBiLKLkYt8zJcp4xTJd1uYyXXEkPw6mnlUIjh1gZPIVKPtRXPmY5kLf6DwZmf5YLwR3QUrRonl7l0A==",
+      "path": "system.text.encoding.codepages/4.4.0",
+      "hashPath": "system.text.encoding.codepages.4.4.0.nupkg.sha512"
+    }
+  }
+}

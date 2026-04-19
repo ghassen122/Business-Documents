@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "dgSpecHash": "NVcaLCERlUBHuVVazChkC2xW3DrdtErbCTNsBhM+EqjtE4YwQsR7CZrY3FspaMelxhCtyMbc1yCtO10KXcAH+w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ghass\\OneDrive\\Bureau\\Generate Documents\\DocEditorService\\DocEditorService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ghass\\.nuget\\packages\\microsoft.netcore.platforms\\2.0.0\\microsoft.netcore.platforms.2.0.0.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\netstandard.library\\2.0.0\\netstandard.library.2.0.0.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\swashbuckle.aspnetcore\\10.1.7\\swashbuckle.aspnetcore.10.1.7.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.compression.net.core\\33.1.49\\syncfusion.compression.net.core.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.docio.net.core\\33.1.49\\syncfusion.docio.net.core.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.ej2.wordeditor.aspnet.core\\33.1.49\\syncfusion.ej2.wordeditor.aspnet.core.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.licensing\\33.1.49\\syncfusion.licensing.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.markdown\\33.1.49\\syncfusion.markdown.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\syncfusion.officechart.net.core\\33.1.49\\syncfusion.officechart.net.core.33.1.49.nupkg.sha512",
+    "C:\\Users\\ghass\\.nuget\\packages\\system.text.encoding.codepages\\4.4.0\\system.text.encoding.codepages.4.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
