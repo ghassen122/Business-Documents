@@ -3,6 +3,7 @@ import { DocumentEditorComponent, Selection, Editor, Inject } from '@syncfusion/
 import JSZip from 'jszip'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Navbar from '../components/Navbar'
 
 const decompressSfdt = async (compressedSfdtStr) => {
   try {
@@ -86,7 +87,12 @@ export default function Admin() {
         initialNames[b.id] = b.placeholder || ('Champ ' + (b.id + 1))
       })
       setBlankNames(initialNames)
-      openInEditor(uncompressedSfdt)
+      // Show _____ instead of raw markers in preview
+      let displaySfdt = uncompressedSfdt
+      ;(data.blanks || []).forEach(b => {
+        displaySfdt = displaySfdt.split(b.marker).join('_____')
+      })
+      openInEditor(displaySfdt)
     } catch (err) {
       alert('Erreur: ' + err.message)
     } finally {
@@ -123,38 +129,34 @@ export default function Admin() {
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif' }}>
-      {/* Header */}
-      <div style={{ padding: '12px 20px', backgroundColor: '#2c3e50', color: 'white', display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <Link href="/" style={{ color: '#bdc3c7', textDecoration: 'none', fontSize: '14px' }}>← Retour</Link>
-        <h2 style={{ margin: 0, fontSize: '18px' }}>🔧 Administrateur — Importer un modèle</h2>
-      </div>
-
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', fontFamily: "'Segoe UI', sans-serif" }}>
+      <Navbar />
       {/* Toolbar: template name + file upload */}
-      <div style={{ padding: '10px 20px', backgroundColor: '#ecf0f1', borderBottom: '1px solid #ccc', display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ padding: '10px 20px', backgroundColor: '#c9f0f2', borderBottom: '1px solid #e3e6e6', display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <span style={{ fontWeight: '700', fontSize: '15px', color: '#1f2937' }}>🔧 Importer un modèle</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label style={{ fontWeight: 'bold', fontSize: '14px', color: '#2c3e50' }}>Nom du modèle:</label>
+          <label style={{ fontWeight: '600', fontSize: '14px', color: '#374151' }}>Nom du modèle:</label>
           <input
             type="text"
             value={templateName}
             onChange={e => setTemplateName(e.target.value)}
             placeholder="Ex: Contrat de mandat"
-            style={{ padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '14px', width: '260px' }}
+            style={{ padding: '6px 10px', border: '1px solid #e3e6e6', borderRadius: '6px', fontSize: '14px', width: '260px', outline: 'none' }}
           />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label style={{ fontWeight: 'bold', fontSize: '14px', color: '#2c3e50' }}>Importer DOCX:</label>
+          <label style={{ fontWeight: '600', fontSize: '14px', color: '#374151' }}>Importer DOCX:</label>
           <input type="file" accept=".docx" onChange={e => handleOpenFile(e.target.files[0])} style={{ fontSize: '14px' }} />
         </div>
-        {loading && <span style={{ color: '#e67e22', fontSize: '14px' }}>⏳ Conversion en cours...</span>}
+        {loading && <span style={{ color: '#6b7280', fontSize: '14px' }}>⏳ Conversion en cours...</span>}
       </div>
 
       {/* Main content */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* Left panel: name each blank */}
-        <div style={{ width: '340px', borderRight: '1px solid #ccc', overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
-          <h3 style={{ marginTop: 0, fontSize: '15px', color: '#2c3e50' }}>📋 Nommer les champs détectés</h3>
+        <div style={{ width: '340px', borderRight: '1px solid #e5e7eb', overflowY: 'auto', padding: '16px', backgroundColor: '#f9fafb' }}>
+          <h3 style={{ marginTop: 0, fontSize: '15px', color: '#1f2937', fontWeight: '700' }}>📋 Nommer les champs détectés</h3>
 
           {blanks.length === 0 ? (
             <p style={{ color: '#aaa', fontSize: '13px' }}>
@@ -163,13 +165,13 @@ export default function Admin() {
           ) : (
             <>
               {blanks.map(blank => (
-                <div key={blank.id} style={{ marginBottom: '14px', padding: '10px', backgroundColor: '#fff', border: '1px solid #e0e0e0', borderRadius: '6px' }}>
-                  <div style={{ fontSize: '11px', color: '#999', marginBottom: '6px', lineHeight: '1.4' }}>
+                <div key={blank.id} style={{ marginBottom: '12px', padding: '12px', backgroundColor: '#fff', border: '1px solid #e3e6e6', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '6px', lineHeight: '1.4' }}>
                     <span>...{blank.contextBefore}</span>
-                    <span style={{ color: '#e74c3c', fontWeight: 'bold' }}> [_____] </span>
+                    <span style={{ color: '#1f2937', fontWeight: 'bold' }}> [_____] </span>
                     <span>{blank.contextAfter}...</span>
                   </div>
-                  <label style={{ display: 'block', fontSize: '12px', color: '#555', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', color: '#374151', marginBottom: '4px', fontWeight: '600' }}>
                     Nom du champ:
                   </label>
                   <input
@@ -177,7 +179,7 @@ export default function Admin() {
                     value={blankNames[blank.id] || ''}
                     onChange={e => setBlankNames(prev => ({ ...prev, [blank.id]: e.target.value }))}
                     placeholder={`Champ ${blank.id + 1}`}
-                    style={{ width: '100%', padding: '6px 8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '7px 10px', border: '1px solid #e3e6e6', borderRadius: '6px', fontSize: '13px', boxSizing: 'border-box', outline: 'none' }}
                   />
                 </div>
               ))}
@@ -188,8 +190,8 @@ export default function Admin() {
                 style={{
                   width: '100%',
                   padding: '10px',
-                  backgroundColor: saved ? '#27ae60' : saving ? '#95a5a6' : '#2980b9',
-                  color: 'white',
+                  backgroundColor: saved ? '#059669' : saving ? '#9ca3af' : '#c9f0f2',
+                  color: saved || saving ? 'white' : '#1f2937',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: saving || saved ? 'default' : 'pointer',
@@ -206,7 +208,7 @@ export default function Admin() {
 
         {/* Right panel: document preview */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '6px 12px', backgroundColor: '#e8f4f8', borderBottom: '1px solid #ddd', fontSize: '12px', color: '#666' }}>
+          <div style={{ padding: '6px 12px', backgroundColor: '#c9f0f2', borderBottom: '1px solid #e3e6e6', fontSize: '12px', color: '#1f2937', fontWeight: '600' }}>
             👁️ Aperçu du document
           </div>
           <DocumentEditorComponent

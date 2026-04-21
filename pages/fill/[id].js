@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { DocumentEditorComponent, Selection, Editor, Inject } from '@syncfusion/ej2-react-documenteditor'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import Navbar from '../../components/Navbar'
 
 export default function Fill() {
   const router = useRouter()
@@ -31,7 +32,12 @@ export default function Fill() {
         const initial = {}
         data.blanks.forEach(b => { initial[b.id] = '' })
         setValues(initial)
-        openInEditor(data.sfdt)
+        // Show _____ instead of raw markers on initial load
+        let displaySfdt = data.sfdt
+        data.blanks.forEach(b => {
+          displaySfdt = displaySfdt.split(b.marker).join('_____')
+        })
+        openInEditor(displaySfdt)
         setLoading(false)
       })
       .catch(err => {
@@ -75,7 +81,8 @@ export default function Fill() {
       let sfdtStr = sfdt
       template.blanks.forEach(b => {
         const val = updated[b.id]
-        sfdtStr = sfdtStr.split(b.marker).join((val && val !== '') ? val : b.marker)
+        // Empty fields show _____ instead of raw marker text
+        sfdtStr = sfdtStr.split(b.marker).join((val && val !== '') ? val : '_____')
       })
       openInEditor(sfdtStr)
     }, 600)
@@ -117,30 +124,30 @@ export default function Fill() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: 'sans-serif', color: '#666' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', fontFamily: "'Segoe UI', sans-serif", color: '#6b7280' }}>
         ⏳ Chargement du document...
       </div>
     )
   }
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', fontFamily: 'sans-serif' }}>
-      {/* Header */}
-      <div style={{ padding: '10px 20px', backgroundColor: '#2c3e50', color: 'white', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-        <Link href="/" style={{ color: '#bdc3c7', textDecoration: 'none', fontSize: '14px', whiteSpace: 'nowrap' }}>← Retour</Link>
-        <h2 style={{ margin: 0, fontSize: '16px', flex: 1 }}>✏️ {template?.name}</h2>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', fontFamily: "'Segoe UI', sans-serif" }}>
+      <Navbar />
+      {/* Sub-header */}
+      <div style={{ padding: '8px 20px', backgroundColor: '#c9f0f2', borderBottom: '1px solid #e3e6e6', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#1f2937', flex: 1 }}>✏️ {template?.name}</h2>
         <button
           onClick={handleDownload}
           disabled={downloading}
           style={{
-            padding: '8px 16px',
-            backgroundColor: downloading ? '#95a5a6' : '#27ae60',
-            color: 'white',
+            padding: '8px 18px',
+            backgroundColor: downloading ? '#9ca3af' : '#c9f0f2',
+            color: downloading ? 'white' : '#1f2937',
             border: 'none',
-            borderRadius: '4px',
+            borderRadius: '6px',
             cursor: downloading ? 'default' : 'pointer',
             fontSize: '14px',
-            fontWeight: 'bold',
+            fontWeight: '600',
             whiteSpace: 'nowrap'
           }}
         >
@@ -151,16 +158,16 @@ export default function Fill() {
       {/* Main content */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Left panel: named form fields */}
-        <div style={{ width: '320px', borderRight: '1px solid #ccc', overflowY: 'auto', padding: '16px', backgroundColor: '#fafafa' }}>
-          <h3 style={{ marginTop: 0, fontSize: '15px', color: '#2c3e50' }}>📋 Remplir les champs</h3>
+        <div style={{ width: '320px', borderRight: '1px solid #e5e7eb', overflowY: 'auto', padding: '16px', backgroundColor: '#f9fafb' }}>
+          <h3 style={{ marginTop: 0, fontSize: '15px', color: '#1f2937', fontWeight: '700' }}>📋 Remplir les champs</h3>
           {template?.blanks.map(blank => (
             <div key={blank.id} style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold', fontSize: '14px', color: '#2c3e50' }}>
+              <label style={{ display: 'block', marginBottom: '4px', fontWeight: '700', fontSize: '14px', color: '#1f2937' }}>
                 {blank.name || blank.placeholder || `Champ ${blank.id + 1}`}
               </label>
-              <div style={{ fontSize: '11px', color: '#aaa', marginBottom: '5px', lineHeight: '1.4' }}>
+              <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '5px', lineHeight: '1.4' }}>
                 <span>...{blank.contextBefore}</span>
-                <span style={{ color: '#e74c3c', fontWeight: 'bold' }}> [_____] </span>
+                <span style={{ color: '#1f2937', fontWeight: 'bold' }}> [_____] </span>
                 <span>{blank.contextAfter}...</span>
               </div>
               <input
@@ -168,7 +175,7 @@ export default function Fill() {
                 placeholder={`Entrer ${blank.name || 'la valeur'}...`}
                 value={values[blank.id] || ''}
                 onChange={e => handleValueChange(blank.id, e.target.value)}
-                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '8px 10px', border: '1px solid #e3e6e6', borderRadius: '6px', fontSize: '14px', boxSizing: 'border-box', outline: 'none' }}
               />
             </div>
           ))}
@@ -176,7 +183,7 @@ export default function Fill() {
 
         {/* Right panel: document preview */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '6px 12px', backgroundColor: '#e8f4f8', borderBottom: '1px solid #ddd', fontSize: '12px', color: '#666' }}>
+          <div style={{ padding: '6px 12px', backgroundColor: '#c9f0f2', borderBottom: '1px solid #e3e6e6', fontSize: '12px', color: '#1f2937', fontWeight: '600' }}>
             📄 Aperçu en temps réel — Mode lecture seule 🔒
           </div>
           <DocumentEditorComponent
