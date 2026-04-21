@@ -1,248 +1,55 @@
-import React, { useRef, useState } from 'react'
-import { DocumentEditorComponent, Selection, Editor, Inject } from '@syncfusion/ej2-react-documenteditor'
-import JSZip from 'jszip'
-
-// Decompress Syncfusion compressed SFDT {"sfdt":"<base64 zip>"} to plain SFDT JSON string
-const decompressSfdt = async (compressedSfdtStr) => {
-  try {
-    const parsed = JSON.parse(compressedSfdtStr)
-    if (!parsed.sfdt) return compressedSfdtStr // already uncompressed
-    const binaryStr = atob(parsed.sfdt)
-    const bytes = new Uint8Array(binaryStr.length)
-    for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i)
-    const zip = await JSZip.loadAsync(bytes)
-    const file = zip.file('sfdt')
-    if (!file) return compressedSfdtStr
-    return await file.async('text')
-  } catch (e) {
-    console.error('decompressSfdt failed:', e)
-    return compressedSfdtStr
-  }
-}
+import React, { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
-  const containerRef = useRef(null)
-  const debounceTimer = useRef(null)
-  const editorReady = useRef(false)
-  const pendingSfdt = useRef(null)
-  const [blanks, setBlanks] = useState([])
-  const [values, setValues] = useState({})
-  const [sfdt, setSfdt] = useState(null)
-  const [fileName, setFileName] = useState('')
+  const [templates, setTemplates] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const openInEditor = (sfdtStr) => {
-    // Diagnostic: log type and preview of what we receive
-    console.log('openInEditor called, type:', typeof sfdtStr, 'length:', sfdtStr?.length)
-    console.log('SFDT preview:', typeof sfdtStr === 'string' ? sfdtStr.substring(0, 200) : JSON.stringify(sfdtStr).substring(0, 200))
-    if (editorReady.current && containerRef.current) {
-      try {
-        // Syncfusion open() needs a string; if it's an object, stringify it
-        const str = typeof sfdtStr === 'string' ? sfdtStr : JSON.stringify(sfdtStr)
-        containerRef.current.open(str)
-      } catch(e) {
-        console.error('open() failed:', e)
-        alert('Erreur open: ' + e.message)
-      }
-    } else {
-      pendingSfdt.current = sfdtStr
-    }
-  }
-
-  const onCreated = () => {
-    // Give the rendering engine a moment to fully initialize after created fires
-    setTimeout(() => {
-      editorReady.current = true
-      if (pendingSfdt.current) {
-        try {
-          const str = typeof pendingSfdt.current === 'string' ? pendingSfdt.current : JSON.stringify(pendingSfdt.current)
-          containerRef.current.open(str)
-        } catch(e) {
-          console.error('open() in onCreated failed:', e)
-          alert('Erreur open: ' + e.message)
-        }
-        pendingSfdt.current = null
-      }
-    }, 500)
-  }
-
-  const handleOpenFile = async (file) => {
-    if (!file) return
-    
-    setFileName(file.name)
-    const fd = new FormData()
-    fd.append('file', file)
-    
-    try {
-      const res = await fetch('/api/proxy-convert', { method: 'POST', body: fd })
-      if (!res.ok) {
-        const txt = await res.text().catch(() => '')
-        alert('Erreur conversion: ' + txt)
-        return
-      }
-      
-      const data = await res.json()
-      console.log('Data received from server:', data)
-
-      // Decompress the SFDT so text replacement and open() both work
-      const uncompressedSfdt = await decompressSfdt(data.sfdt)
-      console.log('Uncompressed SFDT preview:', uncompressedSfdt.substring(0, 200))
-
-      setSfdt(uncompressedSfdt)
-      setBlanks(data.blanks || [])
-      
-      // Initialize form values
-      const initialValues = {}
-      ;(data.blanks || []).forEach(blank => {
-        initialValues[blank.id] = ''
-      })
-      setValues(initialValues)
-      
-      // Display the SFDT in editor (waits for created event if needed)
-      openInEditor(uncompressedSfdt)
-    } catch (err) {
-      console.error('Error:', err)
-      alert('Erreur: ' + err.message)
-    }
-  }
-
-  const handleValueChange = (blankId, newValue) => {
-    const updatedValues = { ...values, [blankId]: newValue }
-    setValues(updatedValues)
-
-    // Debounce: wait 600ms after last keystroke before reloading document
-    // This avoids conflicts with Syncfusion internal mouse/selection events
-    if (debounceTimer.current) clearTimeout(debounceTimer.current)
-    debounceTimer.current = setTimeout(() => {
-      if (!sfdt) return
-      let sfdtStr = sfdt
-      blanks.forEach(b => {
-        const val = updatedValues[b.id]
-        const replaceWith = (val && val !== '') ? val : b.marker
-        sfdtStr = sfdtStr.split(b.marker).join(replaceWith)
-      })
-      openInEditor(sfdtStr)
-    }, 600)
-  }
-
-  const handleDownload = async () => {
-    if (!sfdt || !fileName) {
-      alert('Veuillez d\'abord charger un document')
-      return
-    }
-    
-    try {
-      alert('Téléchargement en développement - contenu: ' + JSON.stringify(values))
-    } catch (err) {
-      console.error('Download error:', err)
-      alert('Erreur lors du téléchargement: ' + err.message)
-    }
-  }
+  useEffect(() => {
+    fetch('/api/templates')
+      .then(r => r.json())
+      .then(data => { setTemplates(data); setLoading(false) })
+      .catch(err => { setError(err.message); setLoading(false) })
+  }, [])
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* Header with Import Button */}
-      <div style={{ 
-        padding: '40px 20px', 
-        borderBottom: '1px solid #ccc', 
-        backgroundColor: '#ffffff',
-        textAlign: 'center',
-        zIndex: 100,
-        position: 'relative'
-      }}>
-        <h2 style={{ marginTop: 0, marginBottom: '16px', color: '#333' }}>📄 Gestionnaire de Documents</h2>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <label style={{ fontWeight: 'bold', fontSize: '16px', color: '#333' }}>Importer un document DOCX:</label>
-          <input 
-            type="file" 
-            accept=".docx" 
-            onChange={(e) => handleOpenFile(e.target.files[0])}
-            style={{ padding: '8px', fontSize: '14px' }}
-          />
-        </div>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f0f2f5', fontFamily: 'sans-serif' }}>
+      <div style={{ padding: '16px 24px', backgroundColor: '#2c3e50', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ margin: 0, fontSize: '22px' }}>📄 Documents disponibles</h1>
+        <Link href="/admin" style={{ padding: '8px 16px', backgroundColor: '#e67e22', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold' }}>
+          🔧 Admin
+        </Link>
       </div>
 
-      {/* Main Content */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        {/* Left Panel - Form */}
-        <div style={{
-          width: '350px',
-          borderRight: '1px solid #ccc',
-          overflowY: 'auto',
-          padding: '16px',
-          backgroundColor: '#fafafa'
-        }}>
-          <h3 style={{ marginTop: 0 }}>📋 Formulaire de remplissage</h3>
-          
-          {blanks.length === 0 ? (
-            <p style={{ color: '#999' }}>Aucun champ à remplir détecté</p>
-          ) : (
-            <>
-              {blanks.map((blank) => (
-                <div key={blank.id} style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '4px', fontWeight: 'bold', fontSize: '14px' }}>
-                    Champ {blank.id + 1}
-                  </label>
-                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>
-                    <span>...{blank.contextBefore}</span>
-                    <span style={{ color: '#d9534f', fontWeight: 'bold' }}>[_____]</span>
-                    <span>{blank.contextAfter}...</span>
-                  </div>
-                  <input
-                    type="text"
-                    placeholder={blank.placeholder}
-                    value={values[blank.id] || ''}
-                    onChange={(e) => handleValueChange(blank.id, e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-                </div>
-              ))}
-              
-              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #ccc' }}>
-                <button
-                  onClick={handleDownload}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#5cb85c',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: 'bold'
-                  }}
-                >
-                  ⬇️ Télécharger le document
-                </button>
-              </div>
-            </>
-          )}
-        </div>
+      <div style={{ padding: '24px' }}>
+        {loading && <p style={{ color: '#666', textAlign: 'center', fontSize: '16px' }}>⏳ Chargement...</p>}
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>Erreur: {error}</p>}
 
-        {/* Right Panel - Document Editor */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '8px', backgroundColor: '#e8f4f8', borderBottom: '1px solid #ddd', fontSize: '12px', color: '#666' }}>
-            📄 Aperçu du document (modifications en temps réel) — Mode lecture seule 🔒
+        {!loading && !error && templates.length === 0 && (
+          <div style={{ textAlign: 'center', marginTop: '80px', color: '#aaa' }}>
+            <p style={{ fontSize: '56px', margin: 0 }}>📭</p>
+            <p style={{ fontSize: '16px', marginTop: '16px' }}>
+              Aucun modèle disponible.{' '}
+              <Link href="/admin" style={{ color: '#2980b9' }}>Importer un document</Link>.
+            </p>
           </div>
-          <DocumentEditorComponent
-            id="container"
-            ref={containerRef}
-            height={'100%'}
-            isReadOnly={true}
-            enableSelection={true}
-            enableEditor={true}
-            serviceUrl={''}
-            created={onCreated}
-          >
-            <Inject services={[Selection, Editor]} />
-          </DocumentEditorComponent>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+          {templates.map(t => (
+            <div key={t.id} style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '20px', boxShadow: '0 1px 4px rgba(0,0,0,0.1)', border: '1px solid #e0e0e0' }}>
+              <div style={{ fontSize: '36px', marginBottom: '10px' }}>📋</div>
+              <h3 style={{ margin: '0 0 8px', fontSize: '16px', color: '#2c3e50' }}>{t.name}</h3>
+              <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#999' }}>📁 {t.fileName}</p>
+              <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#999' }}>
+                🔲 {t.blanksCount} champ{t.blanksCount > 1 ? 's' : ''} · {new Date(t.createdAt).toLocaleDateString('fr-FR')}
+              </p>
+              <Link href={`/fill/${t.id}`} style={{ display: 'block', textAlign: 'center', padding: '9px', backgroundColor: '#2980b9', color: 'white', textDecoration: 'none', borderRadius: '4px', fontSize: '14px', fontWeight: 'bold' }}>
+                ✏️ Remplir
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
     </div>

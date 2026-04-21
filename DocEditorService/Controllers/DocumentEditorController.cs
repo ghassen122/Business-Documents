@@ -207,4 +207,36 @@ public class DocumentEditorController : ControllerBase
                 return Syncfusion.EJ2.DocumentEditor.FormatType.Docx;
         }
     }
+
+    public class ExportRequest
+    {
+        public string Sfdt { get; set; }
+        public string FileName { get; set; }
+    }
+
+    [HttpPost("export")]
+    [DisableRequestSizeLimit]
+    public IActionResult Export([FromBody] ExportRequest req)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(req?.Sfdt)) return BadRequest("sfdt missing");
+
+            // Convert SFDT string back to DOCX
+            Stream docxStream = EJ2WordDocument.Save(req.Sfdt, Syncfusion.EJ2.DocumentEditor.FormatType.Docx);
+            docxStream.Position = 0;
+            using var ms = new MemoryStream();
+            docxStream.CopyTo(ms);
+
+            string name = string.IsNullOrEmpty(req.FileName) ? "document" : req.FileName;
+            if (!name.EndsWith(".docx", StringComparison.OrdinalIgnoreCase)) name += ".docx";
+
+            return File(ms.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", name);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            return StatusCode(500, new { error = ex.Message, stack = ex.StackTrace });
+        }
+    }
 }
