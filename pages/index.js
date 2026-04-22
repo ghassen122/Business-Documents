@@ -57,12 +57,12 @@ export default function Home() {
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#e3e6e6', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: "'Segoe UI', sans-serif" }}>
       <Navbar />
 
       {/* HERO */}
       <section style={{
-        background: 'linear-gradient(135deg, #c9f0f2 0%, #e3e6e6 100%)',
+        background: 'linear-gradient(135deg, white 0%, #f3f4f6 100%)',
         color: '#1f2937',
         padding: '80px 24px 90px',
         textAlign: 'center',
@@ -95,7 +95,7 @@ export default function Home() {
               borderRadius: '8px',
               fontWeight: '600',
               fontSize: '16px',
-              border: '2px solid #c0c4c4',
+              border: '2px solid #d1d5db',
             }}>
               Espace Admin
             </Link>
@@ -130,7 +130,7 @@ export default function Home() {
       </section>
 
       {/* DOCUMENTS */}
-        <section style={{ padding: '72px 24px', backgroundColor: '#e3e6e6' }}>
+        <section style={{ padding: '72px 24px', backgroundColor: '#f3f4f6' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
@@ -139,13 +139,13 @@ export default function Home() {
             </div>
             <Link href="/documents" style={{
               padding: '9px 20px',
-              backgroundColor: '#c9f0f2',
+              backgroundColor: '#e5e7eb',
               color: '#1f2937',
               textDecoration: 'none',
               borderRadius: '6px',
               fontSize: '14px',
               fontWeight: '600',
-              border: '1px solid #b0d8da',
+              border: '1px solid #d1d5db',
             }}>
               Voir tout →
             </Link>
@@ -176,7 +176,7 @@ export default function Home() {
               }}>
                 <div style={{
                   width: '44px', height: '44px', borderRadius: '10px',
-                  backgroundColor: '#c9f0f2', display: 'flex', alignItems: 'center',
+                  backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', fontSize: '22px', marginBottom: '14px',
                 }}>📋</div>
                 <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#1f2937' }}>{t.name}</h3>
@@ -186,8 +186,8 @@ export default function Home() {
                 </p>
                 <Link href={`/fill/${t.id}`} style={{
                   display: 'block', textAlign: 'center', padding: '9px',
-                  backgroundColor: '#c9f0f2', color: '#1f2937', textDecoration: 'none',
-                  borderRadius: '6px', fontSize: '14px', fontWeight: '600', border: '1px solid #b0d8da',
+                  backgroundColor: '#1f2937', color: 'white', textDecoration: 'none',
+                  borderRadius: '6px', fontSize: '14px', fontWeight: '600',
                 }}>
                   ✏️ Remplir
                 </Link>
@@ -212,7 +212,7 @@ export default function Home() {
                 border: '1px solid #e5e7eb',
                 borderRadius: '10px',
                 overflow: 'hidden',
-                backgroundColor: openFaq === i ? '#c9f0f2' : 'white',
+                backgroundColor: openFaq === i ? '#f3f4f6' : 'white',
               }}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}

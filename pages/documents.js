@@ -20,11 +20,11 @@ export default function Documents() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#e3e6e6', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: "'Segoe UI', sans-serif" }}>
       <Navbar />
 
       {/* Page header */}
-      <div style={{ backgroundColor: '#c9f0f2', padding: '36px 24px 40px', color: '#1f2937' }}>
+      <div style={{ backgroundColor: 'white', padding: '36px 24px 40px', color: '#1f2937', borderBottom: '1px solid #e5e7eb' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <h1 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '800' }}>📋 Tous les documents</h1>
           <p style={{ margin: '0 0 24px', color: '#4b5563', fontSize: '15px' }}>
@@ -65,7 +65,7 @@ export default function Documents() {
             }}>
               <div style={{
                 width: '44px', height: '44px', borderRadius: '10px',
-                backgroundColor: '#c9f0f2', display: 'flex', alignItems: 'center',
+                backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', fontSize: '22px', marginBottom: '14px',
               }}>📋</div>
               <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#1f2937' }}>{t.name}</h3>
@@ -75,8 +75,8 @@ export default function Documents() {
               </p>
               <Link href={`/fill/${t.id}`} style={{
                 display: 'block', textAlign: 'center', padding: '9px',
-                backgroundColor: '#c9f0f2', color: '#1f2937', textDecoration: 'none',
-                borderRadius: '6px', fontSize: '14px', fontWeight: '600', border: '1px solid #b0d8da',
+                backgroundColor: '#1f2937', color: 'white', textDecoration: 'none',
+                borderRadius: '6px', fontSize: '14px', fontWeight: '600',
               }}>
                 ✏️ Remplir
               </Link>

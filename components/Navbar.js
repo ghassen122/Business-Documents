@@ -15,8 +15,8 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      backgroundColor: '#c9f0f2',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+      backgroundColor: 'white',
+      boxShadow: '0 1px 0px #e5e7eb',
       position: 'sticky',
       top: 0,
       zIndex: 1000,
@@ -24,54 +24,55 @@ export default function Navbar() {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 24px',
+        padding: '0 40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '64px',
+        height: '72px',
       }}>
         {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '26px' }}>📄</span>
-          <span style={{ color: '#1f2937', fontWeight: '700', fontSize: '18px', letterSpacing: '0.3px', fontFamily: 'sans-serif' }}>
+          <span style={{ fontSize: '28px' }}>📄</span>
+          <span style={{ color: '#1f2937', fontWeight: '800', fontSize: '20px', letterSpacing: '0.3px', fontFamily: 'sans-serif' }}>
             DocGen
           </span>
         </Link>
 
         {/* Desktop links */}
-        <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '32px', alignItems: 'center', justifyContent: 'space-between' }}>
           {LINKS.map(link => {
             const active = router.pathname === link.href
             return (
               <Link key={link.href} href={link.href} style={{
-                color: active ? '#1f2937' : '#4b5563',
+                color: active ? '#1f2937' : '#374151',
                 textDecoration: 'none',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: active ? '700' : '500',
-                backgroundColor: active ? 'rgba(0,0,0,0.08)' : 'transparent',
-                transition: 'background 0.15s',
+                padding: '8px 4px',
+                borderRadius: '4px',
+                fontSize: '16px',
+                fontWeight: '700',
+                borderBottom: active ? '2px solid #111827' : '2px solid transparent',
+                transition: 'border-color 0.15s',
                 fontFamily: 'sans-serif',
               }}>
                 {link.label}
               </Link>
             )
           })}
-          <Link href="/admin" style={{
-            marginLeft: '12px',
-            padding: '8px 18px',
-            backgroundColor: '#1f2937',
-            color: 'white',
-            textDecoration: 'none',
-            borderRadius: '6px',
-            fontSize: '14px',
-            fontWeight: '700',
-            fontFamily: 'sans-serif',
-          }}>
-            🔧 Admin
-          </Link>
         </div>
+
+        {/* Admin button */}
+        <Link href="/admin" style={{
+          padding: '9px 22px',
+          backgroundColor: '#1f2937',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '6px',
+          fontSize: '16px',
+          fontWeight: '700',
+          fontFamily: 'sans-serif',
+        }}>
+          🔧 Admin
+        </Link>
       </div>
     </nav>
   )
