@@ -58,6 +58,36 @@ function buildParaStyle(fmt = {}) {
   return s
 }
 
+// Build a name→style lookup from the doc.sty array
+function buildStylesMap(sty = []) {
+  const map = {}
+  for (const s of sty) {
+    if (s.n) map[s.n] = s
+  }
+  return map
+}
+
+// Merge char formats: later args win over earlier (left = base, right = override)
+function mergeCharFmt(...fmts) {
+  return Object.assign({}, ...fmts)
+}
+
+// Resolve the full inherited cf for a named style, walking up the base chain.
+// e.g. "Heading 2" → base "Normal" → merge(Normal.cf, Heading2.cf)
+function resolveStyleCf(styleName, stylesMap) {
+  const chain = []
+  const visited = new Set()
+  let current = styleName
+  while (current && !visited.has(current)) {
+    visited.add(current)
+    const sty = stylesMap[current]
+    if (!sty) break
+    chain.unshift(sty.cf || {})            // parent before child
+    current = sty.b || sty.basedOn || null // climb up
+  }
+  return mergeCharFmt(...chain)
+}
+
 // Replace all blank markers in a text string
 function applyValues(text, blanks, values) {
   if (!blanks || !text) return text
@@ -70,13 +100,14 @@ function applyValues(text, blanks, values) {
   return result
 }
 
-function renderInlines(inlines, blanks, values) {
+function renderInlines(inlines, blanks, values, baseCf = {}) {
   if (!inlines || inlines.length === 0) return '\u00a0' // non-breaking space for empty lines
 
   // Join all texts to detect cross-run markers
   // Optimized SFDT uses 'tlp' for text; non-optimized uses 'text'
   const getText = r => r.tlp ?? r.text ?? ''
-  const getCf = r => r.cf || r.characterFormat || {}
+  // Full cascade: baseCf (doc+style+block) merged with run's own cf
+  const getCf = r => mergeCharFmt(baseCf, r.cf || r.characterFormat || {})
   const fullText = inlines.map(getText).join('')
   const replaced = applyValues(fullText, blanks, values)
 
@@ -93,8 +124,8 @@ function renderInlines(inlines, blanks, values) {
   }
 
   // Marker found & replaced → re-split on placeholder markers to style them
-  const dominantFmt = inlines.find(r => getText(r).length > 1) || {}
-  const baseStyle = buildCharStyle(getCf(dominantFmt))
+  const dominantRun = inlines.find(r => getText(r).length > 1) || {}
+  const baseStyle = buildCharStyle(getCf(dominantRun))
 
   // Split replaced text on placeholder pattern to highlight unfilled fields
   const parts = replaced.split(/(\[[^\]]+\])/)
@@ -118,30 +149,40 @@ function renderInlines(inlines, blanks, values) {
   })
 }
 
-function renderParagraph(block, key, blanks, values) {
-  const style = buildParaStyle(block.pf || block.paragraphFormat || {})
+// ctx = { stylesMap, docCf }  — passed down through all render functions
+function renderParagraph(block, key, blanks, values, ctx) {
+  const { stylesMap = {}, docCf = {} } = ctx || {}
+  const pf = block.pf || block.paragraphFormat || {}
+  const styleName = pf.stn || pf.styleName || ''
+
+  // Cascade complète en 3 étapes :
+  const styleCf = resolveStyleCf(styleName, stylesMap)   // "Heading 2" → "Normal" → merge
+  const blockCf = block.cf || block.characterFormat || {} // format propre au bloc
+  const baseCf  = mergeCharFmt(docCf, styleCf, blockCf)  // doc + style + bloc = base finale
+
+  const style = buildParaStyle(pf)
   return (
     <p key={key} style={{ margin: 0, padding: 0, ...style }}>
-      {renderInlines(block.i || block.inlines || [], blanks, values)}
+      {renderInlines(block.i || block.inlines || [], blanks, values, baseCf)}
     </p>
   )
 }
 
-function renderCell(cell, key, blanks, values) {
+function renderCell(cell, key, blanks, values, ctx) {
   return (
     <td key={key} style={{ border: '1px solid #d1d5db', padding: '4pt 6pt', verticalAlign: 'top' }}>
-      {(cell.b || cell.blocks || []).map((b, i) => renderParagraph(b, i, blanks, values))}
+      {(cell.b || cell.blocks || []).map((b, i) => renderParagraph(b, i, blanks, values, ctx))}
     </td>
   )
 }
 
-function renderTable(table, key, blanks, values) {
+function renderTable(table, key, blanks, values, ctx) {
   return (
     <table key={key} style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '12pt', tableLayout: 'fixed' }}>
       <tbody>
         {(table.r || table.rows || []).map((row, ri) => (
           <tr key={ri}>
-            {(row.c || row.cells || []).map((cell, ci) => renderCell(cell, ci, blanks, values))}
+            {(row.c || row.cells || []).map((cell, ci) => renderCell(cell, ci, blanks, values, ctx))}
           </tr>
         ))}
       </tbody>
@@ -189,20 +230,33 @@ function SfdtPreview({ sfdtStr, blanks, values }) {
     const mt = secpr.tm ?? secpr.topMargin ?? 66
     const mb_ = secpr.bm ?? secpr.bottomMargin ?? 61
 
+    // Build styles map from doc.sty (optimized) or doc.styles (standard)
+    const stylesMap = buildStylesMap(doc.sty || doc.styles || [])
+
+    // doc.cf = document-level default character format (font, size, etc.)
+    const docCf = doc.cf || doc.characterFormat || {}
+
+    // ctx carries the shared render context passed to all render functions
+    const ctx = { stylesMap, docCf }
+
     // Optimized uses 'b' for blocks, standard uses 'blocks'
     const allBlocks = sections.flatMap(s => s.b || s.blocks || [])
+
+    // Extract base font/size from docCf for the container
+    const baseFontFamily = docCf.ff || docCf.fontFamily || 'Calibri, Arial, sans-serif'
+    const baseFontSize   = docCf.fsz || docCf.fontSize   || 11
 
     return (
       <div style={{
         padding: `${mt}pt ${mr}pt ${mb_}pt ${ml}pt`,
-        fontFamily: 'Calibri, Arial, sans-serif',
-        fontSize: '11pt',
+        fontFamily: baseFontFamily,
+        fontSize: `${baseFontSize}pt`,
         color: '#111827',
       }}>
         {allBlocks.map((block, i) =>
           (block.r || block.rows)
-            ? renderTable(block, i, blanks, values)
-            : renderParagraph(block, i, blanks, values)
+            ? renderTable(block, i, blanks, values, ctx)
+            : renderParagraph(block, i, blanks, values, ctx)
         )}
       </div>
     )
