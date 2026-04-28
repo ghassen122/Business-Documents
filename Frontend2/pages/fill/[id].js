@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import Navbar from '../../components/Navbar'
 import DocRenderer from '../../components/DocRenderer'
 
@@ -8,7 +9,7 @@ const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:300
 
 export default function FillPage() {
   const router = useRouter()
-  const { id }  = router.query
+  const { id } = router.query
 
   const [template,    setTemplate]    = useState(null)
   const [loading,     setLoading]     = useState(true)
@@ -17,7 +18,13 @@ export default function FillPage() {
   const [downloading, setDownloading] = useState(false)
   const [user,        setUser]        = useState(null)
 
-  // Fetch current user (optional — for save-to-account integration)
+  // Lock body scroll so panels scroll independently (restore on unmount)
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  // Check login status
   useEffect(() => {
     fetch(`${BACKEND_API}/api/auth/me`, { credentials: 'include' })
       .then(r => r.ok ? r.json() : null)
@@ -25,7 +32,7 @@ export default function FillPage() {
       .catch(() => {})
   }, [])
 
-  // Load template from docx-viewer API
+  // Load template
   useEffect(() => {
     if (!id) return
     fetch(`${DOCX_API}/api/templates/${id}`)
@@ -68,24 +75,32 @@ export default function FillPage() {
     }
   }
 
+  // Save current page URL then redirect to login
+  function handleConnectClick() {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname)
+    }
+    router.push('/compte')
+  }
+
   // ── Loading ──
   if (loading) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3' }}>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
-      <p style={{ textAlign: 'center', paddingTop: '80px', color: '#9ca3af' }}>Chargement du document...</p>
+      <p className="text-center pt-20 text-gray-400">Chargement du document...</p>
     </div>
   )
 
   // ── Not found ──
   if (error || !template) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3' }}>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
-      <div style={{ textAlign: 'center', paddingTop: '80px' }}>
-        <p style={{ fontSize: '48px', marginBottom: '16px' }}>😕</p>
-        <p style={{ color: '#ef4444', fontWeight: '600', marginBottom: '20px' }}>Document introuvable.</p>
-        <a href="/documents" style={{ color: '#226d68', fontWeight: '700', textDecoration: 'none', fontSize: '15px' }}>
+      <div className="text-center pt-20">
+        <p className="text-[48px] mb-4">😕</p>
+        <p className="text-red-500 font-semibold mb-5">Document introuvable.</p>
+        <Link href="/documents" className="text-brand font-bold no-underline text-[15px]">
           ← Retour aux documents
-        </a>
+        </Link>
       </div>
     </div>
   )
@@ -93,151 +108,130 @@ export default function FillPage() {
   const blanksCount = (template.blanks || []).length
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
-      <style>{`
-        .fill-input:focus { border-color: #226d68 !important; box-shadow: 0 0 0 3px rgba(34,109,104,0.12); }
-        .fill-input { transition: border-color 0.15s, box-shadow 0.15s; }
-        .dl-btn:hover:not(:disabled) { background: #1a5450 !important; transform: translateY(-1px); }
-        .dl-btn { transition: background 0.15s, transform 0.15s; }
-      `}</style>
+    <div className="flex flex-col h-screen overflow-hidden bg-cream font-sans">
 
       <Navbar />
 
-      {/* ── Header bar ── */}
-      <div style={{
-        background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)',
-        padding: '24px 40px',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
+      {/* ── Header bar — gradient must stay inline (multi-stop, no Tailwind equivalent) ── */}
+      <div
+        className="shrink-0 px-10 py-5 text-white flex items-center justify-between flex-wrap gap-4"
+        style={{ background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)' }}>
         <div>
-          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', marginBottom: '4px' }}>
-            <a href="/documents" style={{ color: 'inherit', textDecoration: 'none' }}>Documents</a>
-            {' › '}
-            {template.name}
+          <div className="text-xs text-white/60 mb-1">
+            <Link href="/documents" className="text-white/60 no-underline hover:text-white transition-colors">
+              Documents
+            </Link>
+            {' › '}{template.name}
           </div>
-          <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '800' }}>{template.name}</h1>
-          <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'rgba(255,255,255,0.65)' }}>
+          <h1 className="m-0 text-[22px] font-extrabold">{template.name}</h1>
+          <p className="m-0 mt-1 text-[13px] text-white/65">
             {blanksCount} champ{blanksCount !== 1 ? 's' : ''} à compléter
           </p>
         </div>
         <button
-          className="dl-btn"
           onClick={handleDownload}
           disabled={downloading}
-          style={{
-            padding: '12px 28px', backgroundColor: downloading ? '#9ca3af' : 'white',
-            color: '#226d68', border: 'none', borderRadius: '8px',
-            fontWeight: '700', fontSize: '15px',
-            cursor: downloading ? 'not-allowed' : 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          }}
-        >
+          className="px-7 py-3 bg-white text-brand rounded-lg font-bold text-[15px] border-none shadow-[0_2px_8px_rgba(0,0,0,0.15)] cursor-pointer hover:bg-gray-50 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors">
           {downloading ? '⏳ Génération…' : '📥 Télécharger DOCX'}
         </button>
       </div>
 
-      {/* ── Main layout: form + preview ── */}
-      <div style={{
-        display: 'flex',
-        height: 'calc(100vh - 72px - 88px)',
-        overflow: 'hidden',
-      }}>
+      {/* ── Panels row: flex-1 + min-h-0 lets each panel scroll independently ── */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
 
         {/* Left panel — form */}
-        <div style={{
-          width: '360px',
-          flexShrink: 0,
-          borderRight: '1px solid #e5e7eb',
-          overflowY: 'auto',
-          backgroundColor: 'white',
-          padding: '24px',
-        }}>
+        <div className="w-[360px] shrink-0 border-r border-gray-200 overflow-y-auto bg-white p-6">
           {blanksCount === 0 ? (
-            <div style={{ textAlign: 'center', paddingTop: '48px' }}>
-              <p style={{ fontSize: '36px', marginBottom: '12px' }}>✅</p>
-              <p style={{ color: '#6b7280', fontSize: '14px' }}>
-                Aucun champ à remplir dans ce document.
-              </p>
+            <div className="text-center pt-12">
+              <p className="text-[36px] mb-3">✅</p>
+              <p className="text-gray-500 text-sm">Aucun champ à remplir dans ce document.</p>
             </div>
           ) : (
             <>
-              <h3 style={{ margin: '0 0 20px', fontSize: '15px', fontWeight: '700', color: '#226d68' }}>
-                📝 Remplir les champs
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <h3 className="m-0 mb-5 text-[15px] font-bold text-brand">📝 Remplir les champs</h3>
+              <div className="flex flex-col gap-[18px]">
                 {(template.blanks || []).map(blank => (
                   <div key={blank.id}>
-                    <label style={{
-                      display: 'block', fontSize: '12px', fontWeight: '700',
-                      color: '#374151', marginBottom: '6px', textTransform: 'uppercase',
-                      letterSpacing: '0.4px',
-                    }}>
+                    <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-[0.4px]">
                       {blank.name || `Champ ${blank.id + 1}`}
                     </label>
                     {(blank.contextBefore || blank.contextAfter) && (
-                      <p style={{ margin: '0 0 6px', fontSize: '11px', color: '#9ca3af', lineHeight: 1.5 }}>
-                        …{blank.contextBefore} <em style={{ color: '#d1d5db' }}>[champ]</em> {blank.contextAfter}…
+                      <p className="m-0 mb-1.5 text-[11px] text-gray-400 leading-relaxed">
+                        …{blank.contextBefore} <em className="text-gray-300">[champ]</em> {blank.contextAfter}…
                       </p>
                     )}
                     <input
-                      className="fill-input"
+                      className="fill-input w-full py-[9px] px-3 border border-gray-200 rounded-lg text-sm outline-none font-[inherit] transition-[border-color,box-shadow] duration-150 box-border"
                       type="text"
                       value={values[String(blank.id)] || ''}
                       onChange={e => setValues(v => ({ ...v, [String(blank.id)]: e.target.value }))}
                       placeholder={`Saisir ${blank.name || 'la valeur'}…`}
-                      style={{
-                        width: '100%', padding: '9px 12px',
-                        border: '1px solid #e5e7eb', borderRadius: '8px',
-                        fontSize: '14px', outline: 'none', boxSizing: 'border-box',
-                        fontFamily: 'inherit',
-                      }}
                     />
                   </div>
                 ))}
               </div>
 
-              {/* Download button (also at bottom of form for convenience) */}
               <button
-                className="dl-btn"
                 onClick={handleDownload}
                 disabled={downloading}
-                style={{
-                  marginTop: '28px', width: '100%', padding: '12px',
-                  backgroundColor: downloading ? '#9ca3af' : '#226d68',
-                  color: 'white', border: 'none', borderRadius: '8px',
-                  fontWeight: '700', fontSize: '15px',
-                  cursor: downloading ? 'not-allowed' : 'pointer',
-                }}
-              >
+                className="mt-7 w-full py-3 bg-brand text-white rounded-lg font-bold text-[15px] border-none cursor-pointer hover:bg-brand-dark disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors">
                 {downloading ? '⏳ Génération…' : '📥 Télécharger DOCX'}
               </button>
             </>
           )}
         </div>
 
-        {/* Right panel — live document preview */}
-        <div style={{
-          flex: 1,
-          overflowY: 'auto',
-          backgroundColor: '#f8f7f3',
-          padding: '40px',
-          display: 'flex',
-          justifyContent: 'center',
-        }}>
-          <DocRenderer
-            data={{
-              layout:     template.layout,
-              blocks:     template.blocks,
-              hyperlinks: template.hyperlinks,
-            }}
-            blanks={template.blanks}
-            values={values}
-          />
+        {/* Right panel — live preview */}
+        {/* OUTER: position:relative + overflow:hidden — positioning context, never scrolls */}
+        <div className="flex-1 relative bg-cream overflow-hidden">
+
+          {/* INNER: overflow-auto in both axes.
+              Centering via fit-content + margin:auto — works for any doc width
+              without ever clipping the left edge (unlike justify-center). */}
+          <div className="absolute inset-0 overflow-auto p-10 box-border">
+            <div className="relative mx-auto w-fit">
+              <DocRenderer
+                data={{
+                  layout:     template.layout,
+                  blocks:     template.blocks,
+                  hyperlinks: template.hyperlinks,
+                }}
+                blanks={template.blanks}
+                values={values}
+              />
+
+              {!user && (
+                <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[4px]">
+                  {/* Fixed masked band tied to the document itself.
+                      Because this overlay lives inside the document wrapper,
+                      the same lines stay hidden while the page scrolls. */}
+                  <div className="absolute inset-x-0 top-[66%] h-[132px] bg-cream/35 backdrop-blur-[8px]" />
+
+                  {/* Fade belongs to the document too, not the preview panel. */}
+                  <div
+                    className="absolute inset-x-0 top-[72%] bottom-0"
+                    style={{
+                      background: 'linear-gradient(to bottom, rgba(248,247,243,0) 0%, rgba(248,247,243,0.76) 34%, #f8f7f3 72%)',
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Guest CTA — stays fixed in the panel while the document mask is tied to the page. */}
+          {!user && (
+            <div className="absolute inset-0 pointer-events-none">
+              {/* CTA pill */}
+              <div className="absolute inset-x-0 bottom-0 flex items-center justify-center pb-8">
+                <button
+                  onClick={handleConnectClick}
+                  className="pointer-events-auto flex items-center gap-2 px-8 py-[14px] bg-brand text-white rounded-full font-bold text-[15px] border-none cursor-pointer hover:bg-brand-dark transition-all shadow-[0_4px_28px_rgba(34,109,104,0.50)]">
+                  🔒 Se connecter / S'inscrire
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

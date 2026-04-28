@@ -6,19 +6,19 @@ const DOCX_API    = process.env.NEXT_PUBLIC_DOCX_API    || 'http://localhost:400
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:3007'
 
 const HOW_STEPS = [
-  { n: '1', title: 'Choisir un modèle',    desc: 'Vous pouvez choisir parmi nos modèles de documents disponibles.' },
-  { n: '2', title: 'Remplir le document',   desc: 'Répondez à quelques questions et votre document se crée automatiquement.' },
+  { n: '1', title: 'Choisir un modèle',     desc: 'Vous pouvez choisir parmi nos modèles de documents disponibles.' },
+  { n: '2', title: 'Remplir le document',    desc: 'Répondez à quelques questions et votre document se crée automatiquement.' },
   { n: '3', title: 'Sauvegarder - Imprimer', desc: 'Votre document est prêt à être utilisé ! Vous en faites ce que vous voulez.' },
-  { n: '4', title: 'Avocat en option',       desc: 'Un avocat peut relire votre document personnalisé pour vous conseiller.' },
+  { n: '4', title: 'Avocat en option',        desc: 'Un avocat peut relire votre document personnalisé pour vous conseiller.' },
 ]
 
 export default function Documents() {
-  const [templates, setTemplates]   = useState([])
-  const [loading, setLoading]       = useState(true)
-  const [search, setSearch]         = useState('')
+  const [templates, setTemplates]     = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [search, setSearch]           = useState('')
   const [currentUser, setCurrentUser] = useState(null)
-  const [savedIds, setSavedIds]     = useState(new Set())
-  const [savingId, setSavingId]     = useState(null)
+  const [savedIds, setSavedIds]       = useState(new Set())
+  const [savingId, setSavingId]       = useState(null)
 
   useEffect(() => {
     fetch(`${DOCX_API}/api/templates`)
@@ -66,41 +66,32 @@ export default function Documents() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
-      <style>{`
-        .doc-search-wrap { position: relative; width: 100%; max-width: 560px; margin: 0 auto; }
-        .doc-search-input { width: 100%; padding: 16px 52px 16px 22px; border-radius: 50px; border: none; box-shadow: 0 2px 16px rgba(0,0,0,0.10); font-size: 15px; outline: none; box-sizing: border-box; font-family: inherit; }
-        .doc-search-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 0; color: #226d68; font-size: 20px; display: flex; align-items: center; }
-        .doc-card:hover { box-shadow: 0 8px 28px rgba(34,109,104,0.15) !important; transform: translateY(-3px); }
-        .doc-card { transition: box-shadow 0.2s, transform 0.2s; }
-        .fill-btn:hover { background: #1a5450 !important; }
-        .save-btn:hover { background: #f0fdf4 !important; border-color: #86efac !important; }
-        .step-badge { width: 32px; height: 32px; border-radius: 50%; background: #226d68; color: white; font-weight: 800; font-size: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-      `}</style>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
 
       {/* ── HERO ── */}
-      <div style={{
-        background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)',
-        padding: '64px 24px 72px',
-        textAlign: 'center',
-        color: 'white',
-      }}>
-        <h1 style={{ margin: '0 0 14px', fontSize: 'clamp(26px, 5vw, 44px)', fontWeight: '800', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
+      <div
+        className="px-6 py-16 text-center text-white"
+        style={{ background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)', paddingBottom: '72px' }}>
+        <h1
+          className="font-extrabold leading-[1.2] mb-3.5 text-white"
+          style={{ fontSize: 'clamp(26px, 5vw, 44px)', letterSpacing: '-0.5px', margin: '0 0 14px' }}>
           Créez facilement vos documents juridiques !
         </h1>
-        <p style={{ margin: '0 0 36px', fontSize: '16px', color: 'rgba(255,255,255,0.8)', lineHeight: 1.6 }}>
+        <p className="text-white/80 text-base leading-relaxed mb-9 mt-0">
           Un ingénieux système de formulaire vous guide dans la réalisation de vos documents
         </p>
-        <div className="doc-search-wrap">
+
+        {/* Search bar */}
+        <div className="relative w-full max-w-[560px] mx-auto">
           <input
-            className="doc-search-input"
             type="text"
             placeholder="Rechercher un document"
             value={search}
             onChange={e => setSearch(e.target.value)}
+            className="w-full py-4 pl-[22px] pr-[52px] rounded-[50px] border-none shadow-[0_2px_16px_rgba(0,0,0,0.10)] text-[15px] outline-none font-[inherit] text-gray-700 box-border"
           />
-          <button className="doc-search-icon" tabIndex={-1}>
+          <button tabIndex={-1} className="absolute right-[18px] top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer p-0 flex items-center">
             <svg width="20" height="20" fill="none" stroke="#226d68" strokeWidth="2.5" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="7" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
@@ -109,21 +100,21 @@ export default function Documents() {
       </div>
 
       {/* ── COMMENT ÇA MARCHE ── */}
-      <div style={{ backgroundColor: 'white', padding: '48px 24px 52px', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', margin: '0 0 36px', fontSize: '22px', fontWeight: '800', color: '#1a1a2e' }}>
+      <div className="bg-white border-b border-gray-200 py-12 px-6">
+        <div className="max-w-[900px] mx-auto">
+          <h2 className="text-center text-[22px] font-extrabold text-navy mb-9 mt-0">
             Comment ça marche ?
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '28px' }}>
+          <div className="grid gap-7" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
             {HOW_STEPS.map(s => (
-              <div key={s.n} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div className="step-badge">{s.n}</div>
-                  <span style={{ fontWeight: '700', fontSize: '15px', color: '#226d68' }}>{s.title}</span>
+              <div key={s.n} className="flex flex-col gap-2.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-brand text-white font-extrabold text-[15px] flex items-center justify-center shrink-0">
+                    {s.n}
+                  </div>
+                  <span className="font-bold text-[15px] text-brand">{s.title}</span>
                 </div>
-                <p style={{ margin: 0, fontSize: '13px', color: '#6b7280', lineHeight: 1.6, paddingLeft: '42px' }}>
-                  {s.desc}
-                </p>
+                <p className="m-0 text-[13px] text-gray-500 leading-relaxed pl-[42px]">{s.desc}</p>
               </div>
             ))}
           </div>
@@ -131,70 +122,53 @@ export default function Documents() {
       </div>
 
       {/* ── GRILLE DE TEMPLATES ── */}
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '48px 24px 80px' }}>
+      <div className="max-w-[1100px] mx-auto px-6 py-12 pb-20">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#9ca3af' }}>Chargement des documents...</div>
+          <div className="text-center py-[60px] text-gray-400">Chargement des documents...</div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0' }}>
-            <p style={{ fontSize: '48px', marginBottom: '16px' }}>📭</p>
-            <p style={{ color: '#9ca3af', fontSize: '16px' }}>
+          <div className="text-center py-[60px]">
+            <p className="text-[48px] mb-4">📭</p>
+            <p className="text-gray-400 text-base">
               {search ? `Aucun résultat pour "${search}"` : 'Aucun document disponible pour le moment.'}
             </p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '24px' }}>
+          <div className="flex flex-row flex-wrap gap-6">
             {filtered.map(t => {
-              const saved   = savedIds.has(t.id)
-              const saving  = savingId === t.id
+              const saved  = savedIds.has(t.id)
+              const saving = savingId === t.id
               return (
-                <div key={t.id} className="doc-card" style={{
-                  backgroundColor: 'white', borderRadius: '12px',
-                  border: '1px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                  flex: '1 1 340px',
-                  display: 'flex', alignItems: 'center', gap: '16px',
-                  padding: '16px 20px',
-                }}>
+                <div
+                  key={t.id}
+                  className="doc-card bg-white rounded-xl border border-gray-200 shadow-[0_2px_8px_rgba(0,0,0,0.05)] flex-[1_1_340px] flex items-center gap-4 py-4 px-5 transition-[box-shadow,transform] duration-200">
                   {/* Icon */}
-                  <div style={{
-                    width: '48px', height: '48px', borderRadius: '10px', flexShrink: 0,
-                    background: '#cef0ec',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: '24px',
-                  }}>📄</div>
+                  <div className="w-12 h-12 rounded-[10px] shrink-0 bg-mint flex items-center justify-center text-[24px]">
+                    📄
+                  </div>
 
                   {/* Name + meta */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ margin: '0 0 3px', fontSize: '14px', fontWeight: '700', color: '#1a1a2e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {t.name}
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '11px', color: '#9ca3af' }}>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="m-0 mb-[3px] text-[14px] font-bold text-navy truncate">{t.name}</h3>
+                    <p className="m-0 text-[11px] text-gray-400">
                       {t.blanksCount} champ{t.blanksCount !== 1 ? 's' : ''} · {new Date(t.createdAt).toLocaleDateString('fr-FR')}
                     </p>
                   </div>
 
                   {/* Buttons */}
-                  <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-                    <Link href={`/fill/${t.id}`} className="fill-btn" style={{
-                      padding: '8px 18px', backgroundColor: '#226d68', color: 'white',
-                      borderRadius: '6px', fontWeight: '700', fontSize: '13px',
-                      textDecoration: 'none', transition: 'background 0.15s', whiteSpace: 'nowrap',
-                    }}>
+                  <div className="flex gap-2 shrink-0">
+                    <Link
+                      href={`/fill/${t.id}`}
+                      className="px-[18px] py-2 bg-brand hover:bg-brand-dark text-white no-underline rounded-md font-bold text-[13px] whitespace-nowrap transition-colors duration-150">
                       Remplir →
                     </Link>
                     <button
-                      className="save-btn"
                       onClick={() => toggleSave(t)}
                       disabled={saving}
                       title={saved ? 'Retirer de mes documents' : 'Sauvegarder'}
-                      style={{
-                        width: '36px', height: '36px', borderRadius: '6px',
-                        border: `1px solid ${saved ? '#86efac' : '#e5e7eb'}`,
-                        backgroundColor: saved ? '#f0fdf4' : 'white',
-                        cursor: 'pointer', fontSize: '16px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'background 0.15s, border-color 0.15s',
-                      }}
-                    >
+                      className={`w-9 h-9 rounded-md border flex items-center justify-center text-base cursor-pointer transition-colors duration-150
+                        ${saved
+                          ? 'bg-green-50 border-green-300 hover:bg-green-100'
+                          : 'bg-white border-gray-200 hover:bg-gray-50'}`}>
                       {saving ? '…' : '🔖'}
                     </button>
                   </div>

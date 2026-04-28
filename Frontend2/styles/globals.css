@@ -1,12 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html, body, #__next {
   height: 100%;
   margin: 0;
 }
 
-body {
-  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+/* ── hover effects that need pseudo-selectors ── */
+.feat-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 16px 40px rgba(34, 109, 104, 0.16) !important;
 }
-
-* {
-  box-sizing: border-box;
+.tpl-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(34, 109, 104, 0.18) !important;
+}
+.hero-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22) !important;
+}
+.hero-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+}
+.doc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(34, 109, 104, 0.15) !important;
+}
+.fill-input:focus {
+  border-color: #226d68 !important;
+  box-shadow: 0 0 0 3px rgba(34, 109, 104, 0.12);
 }

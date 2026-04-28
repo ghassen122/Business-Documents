@@ -5,17 +5,6 @@ import Navbar from '../components/Navbar'
 
 const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:3007'
 
-const inputStyle = {
-  width: '100%', padding: '10px 14px', border: '1px solid #e5e7eb',
-  borderRadius: '8px', fontSize: '14px', outline: 'none',
-  boxSizing: 'border-box', backgroundColor: 'white',
-}
-const btnPrimary = {
-  width: '100%', padding: '11px', backgroundColor: '#226d68', color: 'white',
-  border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '15px',
-  cursor: 'pointer',
-}
-
 export default function Compte() {
   const router = useRouter()
   const [mode, setMode]         = useState('login')
@@ -60,6 +49,8 @@ export default function Compte() {
       const data = await r.json()
       if (!r.ok) { setError(data.error || 'Erreur.'); setSubmitting(false); return }
       setUser(data)
+
+      // Handle pending document save (from documents page)
       const pending = sessionStorage.getItem('pendingSave')
       if (pending) {
         sessionStorage.removeItem('pendingSave')
@@ -73,6 +64,15 @@ export default function Compte() {
         router.push('/documents')
         return
       }
+
+      // Handle redirect back to fill page (from fill page mask)
+      const redirectTo = sessionStorage.getItem('redirectAfterLogin')
+      if (redirectTo) {
+        sessionStorage.removeItem('redirectAfterLogin')
+        router.push(redirectTo)
+        return
+      }
+
       fetchMyDocs()
     } catch {
       setError('Erreur réseau.')
@@ -96,91 +96,78 @@ export default function Compte() {
   }
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3' }}>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
-      <p style={{ textAlign: 'center', paddingTop: '80px', color: '#9ca3af' }}>Chargement...</p>
+      <p className="pt-20 text-center text-gray-400">Chargement...</p>
     </div>
   )
 
   // ── Vue connectée ──
   if (user) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
-      <div style={{ maxWidth: '700px', margin: '48px auto', padding: '0 24px' }}>
+      <div className="mx-auto my-12 max-w-[700px] px-6">
 
         {/* Carte profil */}
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '28px 32px', border: '1px solid #e5e7eb', marginBottom: '28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="mb-7 rounded-xl border border-gray-200 bg-white px-8 py-7">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <div style={{ fontSize: '32px', marginBottom: '6px' }}>👤</div>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '700', color: '#226d68' }}>{user.name}</h2>
-              <p style={{ margin: '4px 0 0', fontSize: '14px', color: '#6b7280' }}>{user.email}</p>
+              <div className="mb-1.5 text-[32px]">👤</div>
+              <h2 className="m-0 text-xl font-bold text-brand">{user.name}</h2>
+              <p className="m-0 mt-1 text-sm text-gray-500">{user.email}</p>
             </div>
-            <button onClick={handleLogout} style={{
-              padding: '8px 18px', backgroundColor: 'white', color: '#ef4444',
-              border: '1px solid #ef4444', borderRadius: '8px', fontWeight: '600',
-              fontSize: '13px', cursor: 'pointer',
-            }}>
+            <button
+              onClick={handleLogout}
+              className="rounded-lg border border-red-500 bg-white px-[18px] py-2 text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50">
               Déconnexion
             </button>
           </div>
         </div>
 
         {/* Mes documents */}
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', border: '1px solid #e5e7eb', padding: '24px 32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h3 style={{ margin: 0, fontSize: '17px', fontWeight: '700', color: '#226d68' }}>
+        <div className="rounded-xl border border-gray-200 bg-white px-8 py-6">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h3 className="m-0 text-[17px] font-bold text-brand">
               📁 Mes documents sauvegardés
             </h3>
-            <Link href="/documents" style={{
-              fontSize: '13px', color: '#226d68', fontWeight: '600',
-              textDecoration: 'none', border: '1px solid #e5e7eb',
-              padding: '6px 14px', borderRadius: '6px',
-            }}>
+            <Link
+              href="/documents"
+              className="rounded-md border border-gray-200 px-[14px] py-1.5 text-[13px] font-semibold text-brand no-underline transition-colors hover:bg-cream">
               + Parcourir les documents
             </Link>
           </div>
 
           {myDocs.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '32px 0' }}>
-              <p style={{ fontSize: '32px', marginBottom: '12px' }}>📭</p>
-              <p style={{ color: '#9ca3af', fontSize: '14px' }}>Aucun document sauvegardé pour l'instant.</p>
-              <Link href="/documents" style={{
-                display: 'inline-block', marginTop: '12px',
-                padding: '8px 20px', backgroundColor: '#226d68', color: 'white',
-                textDecoration: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '13px',
-              }}>
+            <div className="py-8 text-center">
+              <p className="mb-3 text-[32px]">📭</p>
+              <p className="text-sm text-gray-400">Aucun document sauvegardé pour l'instant.</p>
+              <Link
+                href="/documents"
+                className="mt-3 inline-block rounded-md bg-brand px-5 py-2 text-[13px] font-semibold text-white no-underline transition-colors hover:bg-brand-dark">
                 Parcourir les documents
               </Link>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="flex flex-col gap-3">
               {myDocs.map((doc, i) => (
-                <div key={i} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  padding: '14px 16px', backgroundColor: '#f8f7f3',
-                  borderRadius: '8px', border: '1px solid #e5e7eb',
-                }}>
+                <div key={i} className="flex items-center justify-between rounded-lg border border-gray-200 bg-cream px-4 py-[14px]">
                   <div>
-                    <div style={{ fontWeight: '600', fontSize: '14px', color: '#1a1a2e' }}>
+                    <div className="text-sm font-semibold text-navy">
                       {doc.templateName || doc.templateId}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#9ca3af', marginTop: '2px' }}>
+                    <div className="mt-0.5 text-xs text-gray-400">
                       {doc.fileName || ''}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <Link href={`/fill/${doc.templateId}`} style={{
-                      padding: '6px 14px', backgroundColor: '#226d68', color: 'white',
-                      textDecoration: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '13px',
-                    }}>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/fill/${doc.templateId}`}
+                      className="rounded-md bg-brand px-[14px] py-1.5 text-[13px] font-semibold text-white no-underline transition-colors hover:bg-brand-dark">
                       Remplir
                     </Link>
-                    <button onClick={() => removeDoc(doc.templateId)} style={{
-                      padding: '6px 12px', backgroundColor: 'white', color: '#ef4444',
-                      border: '1px solid #ef4444', borderRadius: '6px', fontWeight: '600',
-                      fontSize: '13px', cursor: 'pointer',
-                    }}>
+                    <button
+                      onClick={() => removeDoc(doc.templateId)}
+                      className="rounded-md border border-red-500 bg-white px-3 py-1.5 text-[13px] font-semibold text-red-500 transition-colors hover:bg-red-50">
                       ✕
                     </button>
                   </div>
@@ -195,76 +182,93 @@ export default function Compte() {
 
   // ── Vue déconnectée ──
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="min-h-screen bg-cream font-sans">
       <Navbar />
 
-      <div style={{
-        background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)',
-        padding: '48px 24px',
-        textAlign: 'center',
-        color: 'white',
-        marginBottom: '40px',
-      }}>
-        <h1 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '800' }}>
+      <div
+        className="mb-10 px-6 py-12 text-center text-white"
+        style={{ background: 'linear-gradient(160deg, #1a5450 0%, #226d68 55%, #2d8a83 100%)' }}>
+        <h1 className="m-0 mb-2 text-[28px] font-extrabold">
           {mode === 'login' ? '🔐 Connexion' : '✨ Créer un compte'}
         </h1>
-        <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)', fontSize: '15px' }}>
+        <p className="m-0 text-[15px] text-white/75">
           {mode === 'login' ? 'Accédez à vos documents sauvegardés' : 'Rejoignez DocGen pour sauvegarder vos documents'}
         </p>
       </div>
 
-      <div style={{ maxWidth: '420px', margin: '0 auto', padding: '0 24px 60px' }}>
+      <div className="mx-auto max-w-[420px] px-6 pb-[60px]">
         {/* Tabs */}
-        <div style={{ display: 'flex', borderRadius: '10px', overflow: 'hidden', border: '1px solid #e5e7eb', marginBottom: '28px' }}>
+        <div className="mb-7 flex overflow-hidden rounded-[10px] border border-gray-200">
           {['login', 'register'].map(m => (
-            <button key={m} onClick={() => { setMode(m); setError(''); setSuccess('') }} style={{
-              flex: 1, padding: '12px', border: 'none', cursor: 'pointer',
-              fontSize: '14px', fontWeight: '700',
-              backgroundColor: mode === m ? '#226d68' : 'white',
-              color: mode === m ? 'white' : '#6b7280',
-              transition: 'all 0.15s',
-            }}>
+            <button
+              key={m}
+              onClick={() => { setMode(m); setError(''); setSuccess('') }}
+              className={`flex-1 border-none px-3 py-3 text-sm font-bold transition-colors ${mode === m ? 'bg-brand text-white' : 'bg-white text-gray-500 hover:bg-cream'}`}>
               {m === 'login' ? '🔐 Connexion' : '✨ S\'inscrire'}
             </button>
           ))}
         </div>
 
-        <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '28px', border: '1px solid #e5e7eb' }}>
+        <div className="rounded-xl border border-gray-200 bg-white p-7">
           <form onSubmit={handleSubmit}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="flex flex-col gap-4">
               {mode === 'register' && (
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                  <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                     Nom complet
                   </label>
-                  <input style={inputStyle} type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Jean Dupont" required />
+                  <input
+                    className="fill-input w-full rounded-lg border border-gray-200 bg-white px-[14px] py-[10px] text-sm outline-none box-border"
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="Jean Dupont"
+                    required
+                  />
                 </div>
               )}
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                   Adresse email
                 </label>
-                <input style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jean@exemple.fr" required />
+                <input
+                  className="fill-input w-full rounded-lg border border-gray-200 bg-white px-[14px] py-[10px] text-sm outline-none box-border"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="jean@exemple.fr"
+                  required
+                />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '6px' }}>
+                <label className="mb-1.5 block text-[13px] font-semibold text-gray-700">
                   Mot de passe
                 </label>
-                <input style={inputStyle} type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+                <input
+                  className="fill-input w-full rounded-lg border border-gray-200 bg-white px-[14px] py-[10px] text-sm outline-none box-border"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                />
               </div>
 
               {error && (
-                <div style={{ padding: '10px 14px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', fontSize: '13px', color: '#dc2626' }}>
+                <div className="rounded-md border border-red-200 bg-red-50 px-[14px] py-[10px] text-[13px] text-red-600">
                   {error}
                 </div>
               )}
               {success && (
-                <div style={{ padding: '10px 14px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '6px', fontSize: '13px', color: '#16a34a' }}>
+                <div className="rounded-md border border-green-200 bg-green-50 px-[14px] py-[10px] text-[13px] text-green-600">
                   {success}
                 </div>
               )}
 
-              <button type="submit" style={btnPrimary} disabled={submitting}>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-lg bg-brand py-[11px] text-[15px] font-bold text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-gray-400">
                 {submitting ? '⏳ Chargement...' : mode === 'login' ? 'Se connecter' : 'Créer mon compte'}
               </button>
             </div>
