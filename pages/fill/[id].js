@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+﻿import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/router'
 import Navbar from '../../components/Navbar'
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3007'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SFDT → React renderer
@@ -52,9 +54,15 @@ function buildParaStyle(fmt = {}) {
   const leftIndent = fmt.leftIndent ?? fmt.lin
   const rightIndent = fmt.rightIndent ?? fmt.rin
   const firstLine = fmt.firstLineIndent ?? fmt.fin
-  if (leftIndent) s.paddingLeft = `${leftIndent}pt`
+  if (firstLine < 0) {
+    // Hanging indent: paddingLeft covers full block, textIndent pulls first line back
+    s.paddingLeft = `${(leftIndent || 0) + Math.abs(firstLine)}pt`
+    s.textIndent = `${firstLine}pt`
+  } else {
+    if (leftIndent) s.paddingLeft = `${leftIndent}pt`
+    if (firstLine > 0) s.textIndent = `${firstLine}pt`
+  }
   if (rightIndent) s.paddingRight = `${rightIndent}pt`
-  if (firstLine > 0) s.textIndent = `${firstLine}pt`
   return s
 }
 
@@ -190,7 +198,7 @@ function renderTable(table, key, blanks, values, ctx) {
   )
 }
 
-function SfdtPreview({ sfdtStr, blanks, values }) {
+function SfdtPreview({ sfdtStr, blanks, values, onDownload, downloading, masked }) {
   return useMemo(() => {
     if (!sfdtStr) return <p style={{ color: '#9ca3af', padding: '24px' }}>Chargement...</p>
 
@@ -246,21 +254,108 @@ function SfdtPreview({ sfdtStr, blanks, values }) {
     const baseFontFamily = docCf.ff || docCf.fontFamily || 'Calibri, Arial, sans-serif'
     const baseFontSize   = docCf.fsz || docCf.fontSize   || 11
 
+    // Split blocks: first 35% visible, rest masked
+    const cutoff = Math.max(3, Math.ceil(allBlocks.length * 0.35))
+    const visibleBlocks = allBlocks.slice(0, cutoff)
+    const maskedBlocks  = allBlocks.slice(cutoff)
+
+    const containerStyle = {
+      padding: `${mt}pt ${mr}pt ${mb_}pt ${ml}pt`,
+      fontFamily: baseFontFamily,
+      fontSize: `${baseFontSize}pt`,
+      color: '#111827',
+    }
+
+    const renderBlock = (block, i) =>
+      (block.r || block.rows)
+        ? renderTable(block, i, blanks, values, ctx)
+        : renderParagraph(block, i, blanks, values, ctx)
+
+    // If not masked (logged-in user), render everything normally
+    if (!masked) {
+      return (
+        <div style={containerStyle}>
+          {allBlocks.map(renderBlock)}
+        </div>
+      )
+    }
+
     return (
-      <div style={{
-        padding: `${mt}pt ${mr}pt ${mb_}pt ${ml}pt`,
-        fontFamily: baseFontFamily,
-        fontSize: `${baseFontSize}pt`,
-        color: '#111827',
-      }}>
-        {allBlocks.map((block, i) =>
-          (block.r || block.rows)
-            ? renderTable(block, i, blanks, values, ctx)
-            : renderParagraph(block, i, blanks, values, ctx)
+      <div style={containerStyle}>
+        {/* Visible portion */}
+        <div style={{ userSelect: 'none' }}
+          onCopy={e => e.preventDefault()}
+          onContextMenu={e => e.preventDefault()}
+        >
+          {visibleBlocks.map(renderBlock)}
+        </div>
+
+        {/* Masked portion */}
+        {maskedBlocks.length > 0 && (
+          <div style={{ position: 'relative' }}>
+            {/* Gradient fade at the top of masked zone */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0,
+              height: '80px', zIndex: 2,
+              background: 'linear-gradient(to bottom, white 0%, transparent 100%)',
+              pointerEvents: 'none',
+            }} />
+
+            {/* Blurred content */}
+            <div style={{
+              filter: 'blur(5px)',
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+              onCopy={e => e.preventDefault()}
+            >
+              {maskedBlocks.map((block, i) => renderBlock(block, cutoff + i))}
+            </div>
+
+            {/* Overlay CTA */}
+            <div style={{
+              position: 'absolute', inset: 0, zIndex: 3,
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.85) 30%, rgba(255,255,255,0.97) 100%)',
+            }}>
+              <div style={{
+                backgroundColor: 'white',
+                border: '1px solid #e5e7eb',
+                borderRadius: '14px',
+                padding: '28px 32px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                textAlign: 'center',
+                maxWidth: '340px',
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '10px' }}>🔒</div>
+                <p style={{ margin: '0 0 6px', fontWeight: '700', fontSize: '15px', color: '#226d68' }}>
+                  Aperçu limité
+                </p>
+                <p style={{ margin: '0 0 18px', fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }}>
+                  Remplissez les champs et téléchargez le document complet.
+                </p>
+                <button
+                  onClick={onDownload}
+                  disabled={downloading}
+                  style={{
+                    padding: '10px 24px',
+                    backgroundColor: downloading ? '#9ca3af' : '#226d68',
+                    color: 'white', border: 'none', borderRadius: '8px',
+                    fontWeight: '700', fontSize: '14px',
+                    cursor: downloading ? 'default' : 'pointer',
+                    width: '100%',
+                  }}
+                >
+                  {downloading ? '⏳ Export en cours...' : '⬇️ Télécharger le document complet'}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     )
-  }, [sfdtStr, blanks, values])
+  }, [sfdtStr, blanks, values, onDownload, downloading, masked])
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -276,10 +371,19 @@ export default function Fill() {
   const [sfdt, setSfdt] = useState(null)
   const [loading, setLoading] = useState(true)
   const [downloading, setDownloading] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  // Check auth — logged-in users see the full document
+  useEffect(() => {
+    fetch(`${API}/api/auth/me`, { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setIsLoggedIn(!!(data?.id || data?.email)))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!id) return
-    fetch(`/api/templates/${id}`)
+    fetch(`${API}/api/templates/${id}`)
       .then(r => { if (!r.ok) throw new Error('Modèle introuvable'); return r.json() })
       .then(data => {
         setTemplate(data)
@@ -305,7 +409,7 @@ export default function Fill() {
         const val = values[b.id]
         filledSfdt = filledSfdt.split(b.marker).join(val && val !== '' ? val : '')
       })
-      const res = await fetch('/api/download', {
+      const res = await fetch(`${API}/api/download`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sfdt: filledSfdt, fileName: template.fileName }),
@@ -334,13 +438,13 @@ export default function Fill() {
 
       {/* Sub-header */}
       <div style={{ padding: '10px 20px', backgroundColor: 'white', borderBottom: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#1f2937', flex: 1 }}>✏️ {template?.name}</h2>
+        <h2 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#226d68', flex: 1 }}>✏️ {template?.name}</h2>
         <button
           onClick={handleDownload}
           disabled={downloading}
           style={{
             padding: '8px 20px',
-            backgroundColor: downloading ? '#9ca3af' : '#1f2937',
+            backgroundColor: downloading ? '#9ca3af' : '#226d68',
             color: 'white', border: 'none', borderRadius: '6px',
             cursor: downloading ? 'default' : 'pointer',
             fontSize: '14px', fontWeight: '600', whiteSpace: 'nowrap',
@@ -353,11 +457,11 @@ export default function Fill() {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* Left panel: form */}
-        <div style={{ width: '340px', borderRight: '1px solid #e5e7eb', overflowY: 'auto', padding: '28px 24px 32px', backgroundColor: '#f9fafb' }}>
-          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '16px', color: '#1f2937', fontWeight: '700' }}>📋 Remplir les champs</h3>
+        <div style={{ width: '340px', borderRight: '1px solid #e5e7eb', overflowY: 'auto', padding: '28px 24px 32px', backgroundColor: '#f8f7f3' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '24px', fontSize: '16px', color: '#226d68', fontWeight: '700' }}>📋 Remplir les champs</h3>
           {template?.blanks.map(blank => (
             <div key={blank.id} style={{ marginBottom: '22px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '700', fontSize: '14px', color: '#1f2937' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '700', fontSize: '14px', color: '#226d68' }}>
                 {blank.name || `Champ ${blank.id + 1}`}
               </label>
               <div style={{ fontSize: '11px', color: '#9ca3af', marginBottom: '7px', lineHeight: '1.5' }}>
@@ -386,7 +490,7 @@ export default function Fill() {
             borderRadius: '2px',
             minHeight: '1122px',
           }}>
-            <SfdtPreview sfdtStr={sfdt} blanks={template?.blanks} values={values} />
+            <SfdtPreview sfdtStr={sfdt} blanks={template?.blanks} values={values} onDownload={handleDownload} downloading={downloading} masked={!isLoggedIn} />
           </div>
         </div>
 

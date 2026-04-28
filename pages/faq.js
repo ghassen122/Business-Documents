@@ -1,4 +1,4 @@
-import Navbar from '../components/Navbar'
+﻿import Navbar from '../components/Navbar'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -41,10 +41,10 @@ export default function FAQ() {
   const [openFaq, setOpenFaq] = useState(null)
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
       <Navbar />
 
-      <div style={{ backgroundColor: 'white', padding: '40px 24px', color: '#1f2937', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ backgroundColor: 'white', padding: '40px 24px', color: '#226d68', textAlign: 'center', borderBottom: '1px solid #e5e7eb' }}>
         <h1 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '800' }}>❓ Questions fréquentes</h1>
         <p style={{ margin: 0, color: '#4b5563', fontSize: '15px' }}>
           Tout ce que vous devez savoir sur DocGen
@@ -56,7 +56,7 @@ export default function FAQ() {
           {FAQ_ITEMS.map((item, i) => (
             <div key={i} style={{
               border: '1px solid #e5e7eb', borderRadius: '10px', overflow: 'hidden',
-              backgroundColor: openFaq === i ? '#f3f4f6' : 'white',
+              backgroundColor: openFaq === i ? '#f8f7f3' : 'white',
             }}>
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -64,11 +64,11 @@ export default function FAQ() {
                   width: '100%', textAlign: 'left', padding: '18px 20px',
                   background: 'none', border: 'none', cursor: 'pointer',
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  fontSize: '15px', fontWeight: '600', color: '#1f2937',
+                  fontSize: '15px', fontWeight: '600', color: '#226d68',
                 }}
               >
                 {item.q}
-                <span style={{ color: '#1f2937', fontSize: '22px', fontWeight: '300', marginLeft: '12px', lineHeight: 1 }}>
+                <span style={{ color: '#226d68', fontSize: '22px', fontWeight: '300', marginLeft: '12px', lineHeight: 1 }}>
                   {openFaq === i ? '−' : '+'}
                 </span>
               </button>
@@ -84,7 +84,7 @@ export default function FAQ() {
         <div style={{ textAlign: 'center', marginTop: '48px' }}>
           <p style={{ color: '#6b7280', fontSize: '15px', marginBottom: '16px' }}>Vous n'avez pas trouvé votre réponse ?</p>
           <Link href="/" style={{
-            padding: '10px 24px', backgroundColor: '#1f2937', color: 'white',
+            padding: '10px 24px', backgroundColor: '#226d68', color: 'white',
             textDecoration: 'none', borderRadius: '6px', fontWeight: '600', fontSize: '14px',
           }}>
             ← Retour à l'accueil

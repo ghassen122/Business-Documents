@@ -8,11 +8,15 @@
     "start": "next start"
   },
   "dependencies": {
+    "@syncfusion/ej2-charts": "^33.2.3",
     "@syncfusion/ej2-react-documenteditor": "33.1.49",
     "@syncfusion/ej2-react-richtexteditor": "^33.1.49",
+    "bcryptjs": "^3.0.3",
+    "cookie": "^0.7.0",
     "file-saver": "^2.0.5",
     "form-data": "^4.0.5",
     "formidable": "^2.0.1",
+    "jsonwebtoken": "^9.0.3",
     "jszip": "^3.10.1",
     "next": "13.4.10",
     "pizzip": "3.1.1",

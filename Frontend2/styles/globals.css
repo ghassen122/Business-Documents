@@ -1,0 +1,12 @@
+html, body, #__next {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}

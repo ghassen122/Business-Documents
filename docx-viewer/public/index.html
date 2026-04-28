@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOCX Viewer — XML Parser</title>
+  <link rel="stylesheet" href="viewer.css" />
+</head>
+<body>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <div class="toolbar-left">
+    <span class="logo">📄 DOCX Viewer</span>
+    <label class="upload-btn" for="fileInput">
+      Ouvrir un fichier .docx
+      <input type="file" id="fileInput" accept=".docx" hidden />
+    </label>
+  </div>
+  <div class="toolbar-right">
+    <button id="btnZoomOut">−</button>
+    <span id="zoomLabel">100%</span>
+    <button id="btnZoomIn">+</button>
+    <button id="btnToggleDebug">Debug JSON</button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="hidden">
+  <div class="spinner"></div>
+  <span>Parsing DOCX…</span>
+</div>
+
+<!-- MAIN AREA -->
+<div id="mainArea">
+
+  <!-- Document page -->
+  <div id="pageWrapper">
+    <div id="docPage" class="doc-page">
+      <div id="docContent" class="doc-content">
+        <p class="placeholder">Ouvrez un fichier .docx pour commencer.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Debug panel -->
+  <div id="debugPanel" class="hidden">
+    <h3>JSON parsé</h3>
+    <pre id="debugJson"></pre>
+  </div>
+
+</div>
+
+<script src="renderer.js"></script>
+</body>
+</html>

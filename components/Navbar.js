@@ -1,17 +1,45 @@
-import Link from 'next/link'
+﻿import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
-const LINKS = [
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3007'
+
+const NAV_LINKS = [
   { href: '/', label: 'Accueil' },
   { href: '/documents', label: 'Documents' },
-  { href: '/compte', label: 'Compte' },
   { href: '/faq', label: 'FAQ' },
 ]
 
 export default function Navbar() {
   const router = useRouter()
-  const [menuOpen, setMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const [dropdown, setDropdown] = useState(false)
+  const dropdownRef = useRef(null)
+
+  useEffect(() => {
+    fetch(`${API}/api/auth/me`, { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => setUser(data))
+      .catch(() => {})
+  }, [router.pathname])
+
+  // Fermer le dropdown si clic à l'extérieur
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  async function handleLogout() {
+    await fetch(`${API}/api/auth/logout`, { method: 'POST', credentials: 'include' })
+    setUser(null)
+    setDropdown(false)
+    router.push('/')
+  }
 
   return (
     <nav style={{
@@ -33,24 +61,24 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{ fontSize: '28px' }}>📄</span>
-          <span style={{ color: '#1f2937', fontWeight: '800', fontSize: '20px', letterSpacing: '0.3px', fontFamily: 'sans-serif' }}>
+          <span style={{ color: '#226d68', fontWeight: '800', fontSize: '20px', letterSpacing: '0.3px', fontFamily: 'sans-serif' }}>
             DocGen
           </span>
         </Link>
 
         {/* Desktop links */}
-        <div style={{ display: 'flex', gap: '32px', alignItems: 'center', justifyContent: 'space-between' }}>
-          {LINKS.map(link => {
+        <div style={{ display: 'flex', gap: '32px', alignItems: 'center' }}>
+          {NAV_LINKS.map(link => {
             const active = router.pathname === link.href
             return (
               <Link key={link.href} href={link.href} style={{
-                color: active ? '#1f2937' : '#374151',
+                color: '#226d68',
                 textDecoration: 'none',
                 padding: '8px 4px',
                 borderRadius: '4px',
                 fontSize: '16px',
                 fontWeight: '700',
-                borderBottom: active ? '2px solid #111827' : '2px solid transparent',
+                borderBottom: active ? '2px solid #226d68' : '2px solid transparent',
                 transition: 'border-color 0.15s',
                 fontFamily: 'sans-serif',
               }}>
@@ -60,19 +88,62 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Admin button */}
-        <Link href="/admin" style={{
-          padding: '9px 22px',
-          backgroundColor: '#1f2937',
-          color: 'white',
-          textDecoration: 'none',
-          borderRadius: '6px',
-          fontSize: '16px',
-          fontWeight: '700',
-          fontFamily: 'sans-serif',
-        }}>
-          🔧 Admin
-        </Link>
+        {/* Bouton unique dynamique Connexion / Nom */}
+        <div style={{ position: 'relative' }} ref={dropdownRef}>
+          {user ? (
+            <>
+              <button
+                onClick={() => setDropdown(o => !o)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  padding: '9px 18px', border: '2px solid #226d68',
+                  borderRadius: '8px', backgroundColor: '#226d68',
+                  color: 'white', fontWeight: '700', fontSize: '15px',
+                  cursor: 'pointer', fontFamily: 'sans-serif',
+                }}
+              >
+                <span>👤</span>
+                <span>{user.name.split(' ')[0]}</span>
+                <span style={{ fontSize: '11px', opacity: 0.8 }}>▾</span>
+              </button>
+              {dropdown && (
+                <div style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  backgroundColor: 'white', border: '1px solid #e5e7eb',
+                  borderRadius: '10px', boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
+                  minWidth: '180px', overflow: 'hidden', zIndex: 9999,
+                }}>
+                  <Link href="/compte" onClick={() => setDropdown(false)} style={{
+                    display: 'block', padding: '12px 18px',
+                    color: '#226d68', textDecoration: 'none',
+                    fontWeight: '600', fontSize: '14px',
+                    borderBottom: '1px solid #f0f0f0',
+                  }}>
+                    👤 Mon compte
+                  </Link>
+                  <button onClick={handleLogout} style={{
+                    display: 'block', width: '100%', textAlign: 'left',
+                    padding: '12px 18px', color: '#ef4444',
+                    background: 'none', border: 'none',
+                    fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+                  }}>
+                    🚪 Déconnexion
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <Link href="/compte" style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '9px 22px', border: '2px solid #226d68',
+              color: '#226d68', textDecoration: 'none',
+              borderRadius: '8px', fontSize: '15px', fontWeight: '700',
+              fontFamily: 'sans-serif',
+            }}>
+              👤 Connexion
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   )

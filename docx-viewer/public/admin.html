@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocGen — Admin</title>
+  <!-- viewer.css brings shared doc-para / doc-list / doc-table styles -->
+  <link rel="stylesheet" href="viewer.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ====== HEADER ====== -->
+<header id="adminHeader">
+  <div class="header-left">
+    <span class="header-icon">🔧</span>
+    <span class="header-title">DocGen — Admin</span>
+  </div>
+  <div class="header-right">
+    <a href="/" class="header-link">← Retour au site</a>
+    <a href="/admin/templates" class="header-link" id="btnListTemplates">📋 Mes modèles</a>
+  </div>
+</header>
+
+<!-- ====== TOOLBAR ====== -->
+<div id="toolbar">
+  <div class="toolbar-group">
+    <label class="toolbar-label">📂 Importer un modèle DOCX :</label>
+    <label class="upload-btn" for="fileInput">
+      Choisir un fichier
+      <input type="file" id="fileInput" accept=".docx" hidden />
+    </label>
+    <span id="fileNameDisplay" class="file-name-display"></span>
+  </div>
+  <div id="loadingBar" class="loading-bar hidden">
+    <div class="spinner"></div>
+    <span>Analyse en cours…</span>
+  </div>
+</div>
+
+<!-- ====== MAIN LAYOUT (same as admin.js) ====== -->
+<div id="mainLayout">
+
+  <!-- LEFT PANEL: template name + blank naming + publish -->
+  <div id="leftPanel">
+
+    <!-- Template name -->
+    <div class="panel-section">
+      <label class="field-label">Nom du modèle</label>
+      <input
+        type="text"
+        id="templateName"
+        placeholder="Ex : Contrat de mandat"
+        class="text-input"
+      />
+    </div>
+
+    <!-- Blanks list -->
+    <h3 class="panel-heading">📋 Nommer les champs détectés</h3>
+    <div id="blanksList">
+      <p class="empty-msg" id="emptyMsg">Importez un fichier DOCX pour commencer.</p>
+    </div>
+
+    <!-- Publish button -->
+    <button id="btnPublish" class="btn-publish" disabled>
+      ✅ Publier le modèle
+    </button>
+    <div id="publishStatus" class="publish-status hidden"></div>
+
+  </div>
+
+  <!-- RIGHT PANEL: document preview -->
+  <div id="rightPanel">
+    <div id="previewWrapper">
+      <div id="docPage" class="doc-page">
+        <div id="docContent" class="doc-content">
+          <p class="preview-placeholder">La prévisualisation du document apparaîtra ici.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====== TEMPLATES LIST OVERLAY ====== -->
+<div id="templatesOverlay" class="overlay hidden">
+  <div class="overlay-box">
+    <div class="overlay-header">
+      <h2>📋 Modèles publiés</h2>
+      <button class="overlay-close" id="btnCloseOverlay">✕</button>
+    </div>
+    <div id="templatesList">
+      <p class="empty-msg">Chargement…</p>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts shared with renderer -->
+<script src="renderer.js"></script>
+<script src="admin-logic.js"></script>
+</body>
+</html>

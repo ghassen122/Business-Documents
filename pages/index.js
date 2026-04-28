@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Navbar from '../components/Navbar'
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3007'
 
 const FEATURES = [
   {
@@ -50,52 +52,151 @@ export default function Home() {
   const [openFaq, setOpenFaq] = useState(null)
 
   useEffect(() => {
-    fetch('/api/templates')
+    fetch(`${API}/api/templates`)
       .then(r => r.json())
       .then(data => { setTemplates(data); setLoading(false) })
       .catch(() => setLoading(false))
   }, [])
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f3f4f6', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8f7f3', fontFamily: "'Segoe UI', sans-serif" }}>
+      <style>{`
+        @keyframes rayMove {
+          0%   { transform: translateX(-100%) rotate(35deg); }
+          100% { transform: translateX(200vw) rotate(35deg); }
+        }
+        @keyframes rayMove2 {
+          0%   { transform: translateX(-100%) rotate(35deg); }
+          100% { transform: translateX(200vw) rotate(35deg); }
+        }
+        @keyframes rayMove3 {
+          0%   { transform: translateX(-100%) rotate(35deg); }
+          100% { transform: translateX(200vw) rotate(35deg); }
+        }
+        @keyframes heroFadeIn {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes heroBadge {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-badge { animation: heroBadge 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both; }
+        .hero-title { animation: heroFadeIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s both; }
+        .hero-sub   { animation: heroFadeIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.5s both; }
+        .hero-btns  { animation: heroFadeIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.65s both; }
+      `}</style>
+
       <Navbar />
 
       {/* HERO */}
       <section style={{
-        background: 'linear-gradient(135deg, white 0%, #f3f4f6 100%)',
-        color: '#1f2937',
-        padding: '80px 24px 90px',
+        position: 'relative',
+        overflow: 'hidden',
+        backgroundColor: '#226d68',
+        color: 'white',
+        padding: '110px 24px 120px',
         textAlign: 'center',
+        minHeight: '520px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}>
-        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
-          <div style={{ fontSize: '64px', marginBottom: '16px' }}>📄</div>
-          <h1 style={{ margin: '0 0 16px', fontSize: '42px', fontWeight: '800', lineHeight: 1.2 }}>
+        {/* Subtle gradient overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(160deg, #1a5450 0%, #226d68 45%, #2d8a83 100%)',
+          zIndex: 0,
+        }} />
+
+        {/* Light rays */}
+        <div style={{
+          position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1,
+        }}>
+          <div style={{
+            position: 'absolute', top: '-60%', left: '-20%',
+            width: '18%', height: '280%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent)',
+            animation: 'rayMove 9s linear 0s infinite',
+          }} />
+          <div style={{
+            position: 'absolute', top: '-60%', left: '-20%',
+            width: '8%', height: '280%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)',
+            animation: 'rayMove2 9s linear 2.5s infinite',
+          }} />
+          <div style={{
+            position: 'absolute', top: '-60%', left: '-20%',
+            width: '14%', height: '280%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)',
+            animation: 'rayMove3 9s linear 5s infinite',
+          }} />
+          <div style={{
+            position: 'absolute', top: '-60%', left: '-20%',
+            width: '6%', height: '280%',
+            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent)',
+            animation: 'rayMove 9s linear 7s infinite',
+          }} />
+        </div>
+
+        {/* Soft radial glow center */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70%', height: '100%',
+          background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, transparent 70%)',
+          zIndex: 1,
+        }} />
+
+        {/* Content */}
+        <div style={{ maxWidth: '780px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+          <div className="hero-badge" style={{
+            display: 'inline-block', marginBottom: '24px',
+            padding: '5px 16px',
+            backgroundColor: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.25)',
+            borderRadius: '20px',
+            fontSize: '12px', fontWeight: '700', color: 'rgba(255,255,255,0.9)',
+            letterSpacing: '1.5px', textTransform: 'uppercase',
+          }}>
+            Documents juridiques
+          </div>
+          <h1 className="hero-title" style={{
+            margin: '0 0 20px', lineHeight: 1.15, color: 'white',
+            fontSize: 'clamp(36px, 6vw, 62px)', fontWeight: '800',
+            letterSpacing: '-1px',
+          }}>
             Générez vos documents<br />en toute simplicité
           </h1>
-          <p style={{ margin: '0 0 36px', fontSize: '18px', color: '#4b5563', lineHeight: 1.6 }}>
+          <p className="hero-sub" style={{
+            margin: '0 0 44px', fontSize: 'clamp(15px, 2vw, 18px)',
+            color: 'rgba(255,255,255,0.75)', lineHeight: 1.75,
+            maxWidth: '580px', marginLeft: 'auto', marginRight: 'auto',
+          }}>
             Importez un modèle Word, remplissez les champs personnalisés et téléchargez votre document finalisé en moins d'une minute.
           </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="hero-btns" style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/documents" style={{
-              padding: '14px 32px',
-              backgroundColor: '#1f2937',
-              color: 'white',
+              padding: '14px 34px',
+              backgroundColor: 'white',
+              color: '#226d68',
               textDecoration: 'none',
               borderRadius: '8px',
               fontWeight: '700',
               fontSize: '16px',
+              letterSpacing: '0.2px',
             }}>
-              Voir les documents →
+              Voir les documents
             </Link>
             <Link href="/admin" style={{
-              padding: '14px 32px',
-              backgroundColor: '#e3e6e6',
-              color: '#1f2937',
+              padding: '14px 34px',
+              backgroundColor: 'transparent',
+              color: 'white',
               textDecoration: 'none',
               borderRadius: '8px',
               fontWeight: '600',
               fontSize: '16px',
-              border: '2px solid #d1d5db',
+              border: '1.5px solid rgba(255,255,255,0.4)',
             }}>
               Espace Admin
             </Link>
@@ -106,7 +207,7 @@ export default function Home() {
       {/* FEATURES */}
       <section style={{ padding: '72px 24px', backgroundColor: 'white' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
+          <h2 style={{ textAlign: 'center', fontSize: '28px', fontWeight: '700', color: '#226d68', marginBottom: '8px' }}>
             Tout ce dont vous avez besoin
           </h2>
           <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '16px', marginBottom: '48px', marginTop: 0 }}>
@@ -118,10 +219,10 @@ export default function Home() {
                 padding: '28px 24px',
                 borderRadius: '12px',
                 border: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb',
+                backgroundColor: '#f8f7f3',
               }}>
                 <div style={{ fontSize: '36px', marginBottom: '14px' }}>{f.icon}</div>
-                <h3 style={{ margin: '0 0 10px', fontSize: '16px', fontWeight: '700', color: '#1f2937' }}>{f.title}</h3>
+                <h3 style={{ margin: '0 0 10px', fontSize: '16px', fontWeight: '700', color: '#226d68' }}>{f.title}</h3>
                 <p style={{ margin: 0, fontSize: '14px', color: '#6b7280', lineHeight: 1.6 }}>{f.desc}</p>
               </div>
             ))}
@@ -130,17 +231,17 @@ export default function Home() {
       </section>
 
       {/* DOCUMENTS */}
-        <section style={{ padding: '72px 24px', backgroundColor: '#f3f4f6' }}>
+        <section style={{ padding: '72px 24px', backgroundColor: '#f8f7f3' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div>
-              <h2 style={{ margin: '0 0 4px', fontSize: '26px', fontWeight: '700', color: '#1f2937' }}>Documents disponibles</h2>
+              <h2 style={{ margin: '0 0 4px', fontSize: '26px', fontWeight: '700', color: '#226d68' }}>Documents disponibles</h2>
               <p style={{ margin: 0, fontSize: '14px', color: '#6b7280' }}>Sélectionnez un modèle pour commencer</p>
             </div>
             <Link href="/documents" style={{
               padding: '9px 20px',
               backgroundColor: '#e5e7eb',
-              color: '#1f2937',
+              color: '#226d68',
               textDecoration: 'none',
               borderRadius: '6px',
               fontSize: '14px',
@@ -160,7 +261,7 @@ export default function Home() {
               <p style={{ fontSize: '48px', margin: '0 0 12px' }}>📭</p>
               <p style={{ fontSize: '15px' }}>
                 Aucun modèle disponible.{' '}
-                <Link href="/admin" style={{ color: '#1f2937', fontWeight: '600' }}>Importer un document</Link>.
+                <Link href="/admin" style={{ color: '#226d68', fontWeight: '600' }}>Importer un document</Link>.
               </p>
             </div>
           )}
@@ -179,14 +280,14 @@ export default function Home() {
                   backgroundColor: '#e5e7eb', display: 'flex', alignItems: 'center',
                   justifyContent: 'center', fontSize: '22px', marginBottom: '14px',
                 }}>📋</div>
-                <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#1f2937' }}>{t.name}</h3>
+                <h3 style={{ margin: '0 0 6px', fontSize: '15px', fontWeight: '700', color: '#226d68' }}>{t.name}</h3>
                 <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#9ca3af' }}>📁 {t.fileName}</p>
                 <p style={{ margin: '0 0 18px', fontSize: '12px', color: '#9ca3af' }}>
                   🔲 {t.blanksCount} champ{t.blanksCount > 1 ? 's' : ''} · {new Date(t.createdAt).toLocaleDateString('fr-FR')}
                 </p>
                 <Link href={`/fill/${t.id}`} style={{
                   display: 'block', textAlign: 'center', padding: '9px',
-                  backgroundColor: '#1f2937', color: 'white', textDecoration: 'none',
+                  backgroundColor: '#226d68', color: 'white', textDecoration: 'none',
                   borderRadius: '6px', fontSize: '14px', fontWeight: '600',
                 }}>
                   ✏️ Remplir
@@ -200,7 +301,7 @@ export default function Home() {
       {/* FAQ */}
       <section id="faq" style={{ padding: '72px 24px', backgroundColor: 'white' }}>
         <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '28px', fontWeight: '700', color: '#1f2937', marginBottom: '8px' }}>
+          <h2 style={{ textAlign: 'center', fontSize: '28px', fontWeight: '700', color: '#226d68', marginBottom: '8px' }}>
             Questions fréquentes
           </h2>
           <p style={{ textAlign: 'center', color: '#6b7280', fontSize: '15px', marginBottom: '40px', marginTop: 0 }}>
@@ -212,7 +313,7 @@ export default function Home() {
                 border: '1px solid #e5e7eb',
                 borderRadius: '10px',
                 overflow: 'hidden',
-                backgroundColor: openFaq === i ? '#f3f4f6' : 'white',
+                backgroundColor: openFaq === i ? '#f8f7f3' : 'white',
               }}>
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -220,11 +321,11 @@ export default function Home() {
                     width: '100%', textAlign: 'left', padding: '18px 20px',
                     background: 'none', border: 'none', cursor: 'pointer',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    fontSize: '15px', fontWeight: '600', color: '#1f2937',
+                    fontSize: '15px', fontWeight: '600', color: '#226d68',
                   }}
                 >
                   {item.q}
-                  <span style={{ color: '#1f2937', fontSize: '22px', fontWeight: '300', marginLeft: '12px', lineHeight: 1 }}>
+                  <span style={{ color: '#226d68', fontSize: '22px', fontWeight: '300', marginLeft: '12px', lineHeight: 1 }}>
                     {openFaq === i ? '−' : '+'}
                   </span>
                 </button>
@@ -240,7 +341,7 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer style={{ backgroundColor: '#1f2937', color: '#9ca3af', padding: '32px 24px', textAlign: 'center' }}>
+      <footer style={{ backgroundColor: '#226d68', color: '#9ca3af', padding: '32px 24px', textAlign: 'center' }}>
         <p style={{ margin: '0 0 8px', fontSize: '16px', fontWeight: '700', color: 'white' }}>📄 DocGen</p>
         <p style={{ margin: 0, fontSize: '13px' }}>© {new Date().getFullYear()} DocGen — Tous droits réservés</p>
       </footer>
