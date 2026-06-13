@@ -3,8 +3,6 @@ import { DocumentEditorComponent, Selection, Editor, Inject } from '@syncfusion/
 import JSZip from 'jszip'
 import { useRouter } from 'next/router'
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3007'
-
 const decompressSfdt = async (compressedSfdtStr) => {
   try {
     const parsed = JSON.parse(compressedSfdtStr)
@@ -35,18 +33,8 @@ export default function Admin() {
   const [adminError, setAdminError] = useState('')
   const [adminLoggingIn, setAdminLoggingIn] = useState(false)
 
-  // --- Editor state (tous les hooks doivent être AVANT tout return conditionnel) ---
-  const [templateName, setTemplateName] = useState('')
-  const [fileName, setFileName] = useState('')
-  const [sfdt, setSfdt] = useState(null)
-  const [blanks, setBlanks] = useState([])
-  const [blankNames, setBlankNames] = useState({})
-  const [loading, setLoading] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-
   useEffect(() => {
-    fetch(`${API}/api/auth/admin-me`, { credentials: 'include' })
+    fetch('/api/auth/admin-me')
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         setIsAdmin(!!data?.admin)
@@ -60,10 +48,9 @@ export default function Admin() {
     setAdminError('')
     setAdminLoggingIn(true)
     try {
-      const res = await fetch(`${API}/api/auth/admin-login`, {
+      const res = await fetch('/api/auth/admin-login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ password: adminPass }),
       })
       if (res.ok) {
@@ -80,7 +67,7 @@ export default function Admin() {
   }
 
   async function handleAdminLogout() {
-    await fetch(`${API}/api/auth/admin-logout`, { method: 'POST', credentials: 'include' })
+    await fetch('/api/auth/admin-logout', { method: 'POST' })
     setIsAdmin(false)
   }
 
@@ -137,6 +124,15 @@ export default function Admin() {
 
   // --- Admin is authenticated, show full admin UI ---
 
+  const [templateName, setTemplateName] = useState('')
+  const [fileName, setFileName] = useState('')
+  const [sfdt, setSfdt] = useState(null)
+  const [blanks, setBlanks] = useState([])
+  const [blankNames, setBlankNames] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
   const openInEditor = (sfdtStr) => {
     if (editorReady.current && containerRef.current) {
       try {
@@ -172,7 +168,7 @@ export default function Admin() {
     const fd = new FormData()
     fd.append('file', file)
     try {
-      const res = await fetch(`${API}/api/proxy-convert`, { method: 'POST', body: fd })
+      const res = await fetch('/api/proxy-convert', { method: 'POST', body: fd })
       if (!res.ok) {
         const txt = await res.text()
         alert('Erreur conversion: ' + txt)
@@ -209,7 +205,7 @@ export default function Admin() {
         ...b,
         name: (blankNames[b.id] || '').trim() || ('Champ ' + (b.id + 1))
       }))
-      const res = await fetch(`${API}/api/templates`, {
+      const res = await fetch('/api/templates', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: templateName.trim(), fileName, sfdt, blanks: namedBlanks })

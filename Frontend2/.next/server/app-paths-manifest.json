@@ -1,0 +1,9 @@
+{
+  "/page": "app/page.js",
+  "/documents/page": "app/documents/page.js",
+  "/template/[id]/page": "app/template/[id]/page.js",
+  "/faq/page": "app/faq/page.js",
+  "/fill/[id]/page": "app/fill/[id]/page.js",
+  "/Contact/page": "app/Contact/page.js",
+  "/checkout/page": "app/checkout/page.js"
+}

@@ -1,0 +1,14 @@
+const express = require('express');
+const router  = express.Router();
+const { getMyOrders, downloadOrder, downloadOrderLoPdf, listOrders, createGuestOrder, handleStripeWebhook, createGuestPaymentIntent, confirmGuestPayment, notifyPaymentFailed } = require('../controllers/orderController');
+router.get('/my',                       getMyOrders);
+router.post('/:id/download',            downloadOrder);
+router.post('/:id/download-pdf',        downloadOrderLoPdf);
+router.get('/list',                     listOrders);              // admin
+router.post('/guest-create',            createGuestOrder);        // legacy guest checkout redirect (non utilisé en frontend)
+router.post('/guest-payment-intent',    createGuestPaymentIntent); // Elements inline
+router.post('/guest-confirm',           confirmGuestPayment);      // Elements confirm + stream PDF
+router.post('/:id/payment-failed',      notifyPaymentFailed);      // card declined → notify client
+router.post('/webhook',                 handleStripeWebhook);      // Stripe webhook
+
+module.exports = router;
