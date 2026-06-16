@@ -1,0 +1,69 @@
+name: Deploy Business Documents
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Backend Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/business-documents:backend ./backend2
+
+      - name: Build Frontend Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/business-documents:frontend ./Frontend2
+
+      - name: Build Admin Image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/business-documents:admin ./admin-ui
+
+      - name: Push Backend Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/business-documents:backend
+
+      - name: Push Frontend Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/business-documents:frontend
+
+      - name: Push Admin Image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/business-documents:admin
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull Images from Docker Hub
+        run: |
+          docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:backend
+          docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:frontend
+          docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:admin
+
+      - name: Stop and Remove Old Containers
+        run: docker compose -f /home/ubuntu/app/docker-compose.yml down || true
+
+      - name: Create .env file
+        run: |
+          cat > /home/ubuntu/app/.env << EOF
+          PORT=4001
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          SMTP_HOST=${{ secrets.SMTP_HOST }}
+          SMTP_PORT=${{ secrets.SMTP_PORT }}
+          SMTP_USER=${{ secrets.SMTP_USER }}
+          SMTP_PASS=${{ secrets.SMTP_PASS }}
+          SMTP_FROM=${{ secrets.SMTP_FROM }}
+          EOF
+
+      - name: Copy docker-compose to EC2
+        run: cp $GITHUB_WORKSPACE/docker-compose.yml /home/ubuntu/app/docker-compose.yml
+
+      - name: Start Containers
+        run: docker compose -f /home/ubuntu/app/docker-compose.yml up -d

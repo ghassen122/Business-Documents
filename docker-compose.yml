@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    image: ghassenhar/business-documents:backend
+    container_name: backend-container
+    ports:
+      - "4001:4001"
+    env_file:
+      - .env
+    restart: always
+
+  frontend:
+    image: ghassenhar/business-documents:frontend
+    container_name: frontend-container
+    ports:
+      - "3001:3001"
+    restart: always
+
+  admin:
+    image: ghassenhar/business-documents:admin
+    container_name: admin-container
+    ports:
+      - "4002:4002"
+    restart: always
