@@ -37,14 +37,20 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
+      - name: Ensure app directory exists
+        run: mkdir -p /home/ubuntu/app
+
+      - name: Free Docker Space
+        run: |
+          docker compose -f /home/ubuntu/app/docker-compose.yml down || true
+          docker system prune -af || true
+          docker builder prune -af || true
+
       - name: Pull Images from Docker Hub
         run: |
           docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:backend
           docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:frontend
           docker pull ${{ secrets.DOCKER_USERNAME }}/business-documents:admin
-
-      - name: Stop and Remove Old Containers
-        run: docker compose -f /home/ubuntu/app/docker-compose.yml down || true
 
       - name: Create .env file
         run: |
