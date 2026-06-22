@@ -37,9 +37,6 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4.2.2
-
       - name: Ensure app directory exists
         run: mkdir -p /home/ubuntu/app
 
@@ -71,8 +68,35 @@ jobs:
           SMTP_FROM=${{ secrets.SMTP_FROM }}
           EOF
 
-      - name: Copy docker-compose to EC2
-        run: cp $GITHUB_WORKSPACE/docker-compose.yml /home/ubuntu/app/docker-compose.yml
+      - name: Create docker-compose on EC2
+        run: |
+          cat > /home/ubuntu/app/docker-compose.yml << 'EOF'
+          version: '3.8'
+
+          services:
+            backend:
+              image: ghassenhar/business-documents:backend
+              container_name: backend-container
+              ports:
+                - "4001:4001"
+              env_file:
+                - .env
+              restart: always
+
+            frontend:
+              image: ghassenhar/business-documents:frontend
+              container_name: frontend-container
+              ports:
+                - "3001:3001"
+              restart: always
+
+            admin:
+              image: ghassenhar/business-documents:admin
+              container_name: admin-container
+              ports:
+                - "4002:4002"
+              restart: always
+          EOF
 
       - name: Start Containers
         run: docker compose -f /home/ubuntu/app/docker-compose.yml up -d
