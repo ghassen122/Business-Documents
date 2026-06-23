@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{\"app\\\\page.tsx -> ../components/DocRenderer\":{\"id\":\"app\\\\page.tsx -> ../components/DocRenderer\",\"files\":[\"static/chunks/_app-pages-browser_components_DocRenderer_tsx.js\"]}}"
+self.__REACT_LOADABLE_MANIFEST='{"app\\\\page.tsx -> ../components/DocRenderer":{"id":396,"files":["static/chunks/396.327458a7dc6e0c36.js"]}}';

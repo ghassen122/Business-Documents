@@ -102,6 +102,8 @@ jobs:
               container_name: admin-container
               ports:
                 - "4002:4002"
+              env_file:
+                - .env
               restart: always
           EOF
 
