@@ -24,13 +24,7 @@ connectDB();
 app.use('/api/orders/webhook', express.raw({ type: 'application/json' }));
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: true,
   credentials: true,
 }));
 app.use(cookieParser());
