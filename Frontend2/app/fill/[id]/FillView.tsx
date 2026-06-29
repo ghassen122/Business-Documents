@@ -6,7 +6,7 @@ import Navbar from '../../(components)/Navbar'
 import DocRenderer from '../../(components)/DocRenderer'
 import type { DocumentTemplate } from '@/types/document'
 
-const DOCX_API    = process.env.NEXT_PUBLIC_DOCX_API    || 'http://localhost:4001'
+const DOCX_API    = process.env.NEXT_PUBLIC_DOCX_API    || 'http://backend:4001'
 
 interface Props {
   template: DocumentTemplate

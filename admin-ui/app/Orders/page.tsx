@@ -1,7 +1,7 @@
 import OrderView from './orderView'
 import type { Order } from '@/types/document'
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://Backend:4001'
 
 export default async function OrdersPage() {
   let orders: Order[] = []

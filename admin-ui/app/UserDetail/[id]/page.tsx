@@ -1,7 +1,7 @@
 import { UserDocument } from "@/types/document"
 import UserView from "./UserView"
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
 
 interface Props {
   params: { id: string }

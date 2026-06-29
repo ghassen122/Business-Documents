@@ -12,7 +12,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import Link from 'next/link'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-const DOCX_API = process.env.NEXT_PUBLIC_DOCX_API || 'http://localhost:4001'
+const DOCX_API = process.env.NEXT_PUBLIC_DOCX_API || 'http://backend:4001'
 
 // ─── Card element shared style ─────────────────────────────────────────────
 const CARD_STYLE = {

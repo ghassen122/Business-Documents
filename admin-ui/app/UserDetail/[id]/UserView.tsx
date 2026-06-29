@@ -9,7 +9,7 @@ interface Props {
   orderId?: string
 }
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
 
 function DocCard({ doc: initialDoc, index, userEmail }: { doc: UserDocument; index: number; userEmail: string }) {
   const [doc,        setDoc]        = useState(initialDoc)

@@ -14,7 +14,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import Navbar from '../(components)/Navbar'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
-const DOCX_API      = process.env.NEXT_PUBLIC_DOCX_API || 'http://localhost:4001'
+const DOCX_API      = process.env.NEXT_PUBLIC_DOCX_API || 'http://backend:4001'
 
 // ─── Stored draft shape (saved in sessionStorage by FillView) ──────────────
 interface CheckoutDraft {

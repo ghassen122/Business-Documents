@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '@/state/hooks'
 import { clearUser, setUser } from '@/state/slices/authSlice'
 import type { AuthUser } from '@/state/api/authApi'
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
 
 const NAV_LINKS = [
   { href: '/',          label: 'Accueil'   },

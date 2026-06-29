@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { Order } from '@/types/document'
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
 export const orderApi = createApi({
   reducerPath: 'orderApi',
 

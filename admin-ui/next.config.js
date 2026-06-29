@@ -12,7 +12,7 @@ const nextConfig = {
       afterFiles: [
         {
           source: '/api/:path((?!admin-login).*)',
-          destination: 'http://localhost:4001/api/:path*',
+          destination: 'http://backend:4001/api/:path*',
         },
       ],
       fallback: [],
