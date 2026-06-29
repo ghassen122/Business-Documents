@@ -12,7 +12,7 @@ import { userApi } from '@/state/api/userApi'
 import type { AuthUser } from '@/state/api/authApi'
 import type { UserDocument } from '@/types/document'
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://13.61.104.59:4001'
 
 interface Props {
   initialUser: AuthUser | null

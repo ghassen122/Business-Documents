@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Navbar from '../(components)/Navbar'
 
-const DOCX_API = process.env.NEXT_PUBLIC_DOCX_API || 'http://backend:4001'
+const DOCX_API = process.env.NEXT_PUBLIC_DOCX_API || 'http://13.61.104.59:4001'
 
 const SUBJECTS = [
   'Question générale',

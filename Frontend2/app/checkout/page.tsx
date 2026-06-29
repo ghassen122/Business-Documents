@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import CheckoutPage from './CheckoutPage'
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://backend:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://13.61.104.59:4001'
 
 export default async function CheckoutRoute() {
   const cookieStore  = await cookies()

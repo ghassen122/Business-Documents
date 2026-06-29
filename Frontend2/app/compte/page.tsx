@@ -3,7 +3,7 @@ import CompteView from './CompteView'
 import type { AuthUser } from '@/state/api/authApi'
 import type { UserDocument } from '@/types/document'
 
-const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://localhost:4001'
+const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || 'http://13.61.104.59:4001'
 
 export default async function ComptePage() {
   const cookieStore = await cookies()

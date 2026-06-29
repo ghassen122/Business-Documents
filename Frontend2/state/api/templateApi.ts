@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { DocumentTemplate } from '@/types/document'
 
-const API_BASE = process.env.NEXT_PUBLIC_DOCX_API || 'http://backend:4001'
+const API_BASE = process.env.NEXT_PUBLIC_DOCX_API || 'http://13.61.104.59:4001'
 
 export const templateApi = createApi({
   reducerPath: 'templateApi',
